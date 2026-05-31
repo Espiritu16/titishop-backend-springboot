@@ -1,6 +1,9 @@
 package com.titishop.compartido.exception;
 
 import com.titishop.compartido.response.ErrorResponse;
+import com.titishop.inventario.exception.InventarioDuplicadoPorProductoException;
+import com.titishop.inventario.exception.InventarioNoEncontradoException;
+import com.titishop.inventario.exception.ProductoInactivoParaInventarioException;
 import com.titishop.productos.exception.CategoriaNoEncontradaException;
 import com.titishop.productos.exception.MarcaNoEncontradaException;
 import com.titishop.productos.exception.NombreCategoriaDuplicadoException;
@@ -36,9 +39,24 @@ public class ManejadorGlobalException {
 		return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, List.of());
 	}
 
+	@ExceptionHandler(InventarioNoEncontradoException.class)
+	ResponseEntity<ErrorResponse> manejarInventarioNoEncontrado(InventarioNoEncontradoException ex, HttpServletRequest request) {
+		return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, List.of());
+	}
+
 	@ExceptionHandler({SkuDuplicadoException.class, NombreCategoriaDuplicadoException.class})
 	ResponseEntity<ErrorResponse> manejarDuplicados(RuntimeException ex, HttpServletRequest request) {
 		return build(HttpStatus.CONFLICT, ex.getMessage(), request, List.of());
+	}
+
+	@ExceptionHandler(InventarioDuplicadoPorProductoException.class)
+	ResponseEntity<ErrorResponse> manejarInventarioDuplicado(InventarioDuplicadoPorProductoException ex, HttpServletRequest request) {
+		return build(HttpStatus.CONFLICT, ex.getMessage(), request, List.of());
+	}
+
+	@ExceptionHandler(ProductoInactivoParaInventarioException.class)
+	ResponseEntity<ErrorResponse> manejarProductoInactivoInventario(ProductoInactivoParaInventarioException ex, HttpServletRequest request) {
+		return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request, List.of());
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
