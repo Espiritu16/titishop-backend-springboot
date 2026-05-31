@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -35,6 +36,17 @@ public class Usuario extends AuditoriaEntity {
 	@Column(nullable = false, length = 20)
 	private EstadoUsuario estado = EstadoUsuario.ACTIVO;
 
+	protected Usuario() {
+	}
+
+	public Usuario(String nombreCompleto, String email, String passwordHash, RolUsuario rol) {
+		this.nombreCompleto = nombreCompleto;
+		this.email = email;
+		this.passwordHash = passwordHash;
+		this.rol = rol;
+		this.estado = EstadoUsuario.ACTIVO;
+	}
+
 	public UUID getId() {
 		return id;
 	}
@@ -57,5 +69,24 @@ public class Usuario extends AuditoriaEntity {
 
 	public EstadoUsuario getEstado() {
 		return estado;
+	}
+
+	public void actualizar(String nombreCompleto, String email, RolUsuario rol, EstadoUsuario estado) {
+		this.nombreCompleto = nombreCompleto;
+		this.email = email;
+		this.rol = rol;
+		this.estado = estado;
+		setActualizadoEn(Instant.now());
+	}
+
+	public void actualizarPassword(String passwordHash) {
+		this.passwordHash = passwordHash;
+		setActualizadoEn(Instant.now());
+	}
+
+	public void inactivar() {
+		this.estado = EstadoUsuario.INACTIVO;
+		setInactivadoEn(Instant.now());
+		setActualizadoEn(Instant.now());
 	}
 }

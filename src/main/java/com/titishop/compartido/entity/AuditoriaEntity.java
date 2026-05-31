@@ -31,4 +31,36 @@ public abstract class AuditoriaEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "inactivado_por_id")
 	private Usuario inactivadoPor;
+
+	public Instant getCreadoEn() {
+		return creadoEn;
+	}
+
+	public Usuario getCreadoPor() {
+		return creadoPor;
+	}
+
+	public Instant getActualizadoEn() {
+		return actualizadoEn;
+	}
+
+	public Usuario getActualizadoPor() {
+		return actualizadoPor;
+	}
+
+	public Instant getInactivadoEn() {
+		return inactivadoEn;
+	}
+
+	public Usuario getInactivadoPor() {
+		return inactivadoPor;
+	}
+
+	public void setActualizadoEn(Instant actualizadoEn) {
+		this.actualizadoEn = actualizadoEn;
+	}
+
+	public void setInactivadoEn(Instant inactivadoEn) {
+		this.inactivadoEn = inactivadoEn;
+	}
 }

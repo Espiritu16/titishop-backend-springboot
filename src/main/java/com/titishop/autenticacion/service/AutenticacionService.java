@@ -6,6 +6,7 @@ import com.titishop.autenticacion.security.JwtService;
 import com.titishop.usuarios.entity.Usuario;
 import com.titishop.usuarios.repository.UsuarioRepository;
 import java.time.Instant;
+import java.util.Locale;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class AutenticacionService {
 	}
 
 	public LoginResponse login(LoginRequest request) {
-		String email = request.email().trim().toLowerCase();
+		String email = request.email().trim().toLowerCase(Locale.ROOT);
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.password()));
 
 		Usuario usuario = usuarioRepository.findByEmailIgnoreCase(email)
