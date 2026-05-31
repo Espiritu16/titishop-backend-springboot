@@ -88,6 +88,22 @@ class UsuarioControllerTests {
 	}
 
 	@Test
+	void actualizarConPasswordSoloEspaciosRetorna400() throws Exception {
+		ActualizarUsuarioRequest request = new ActualizarUsuarioRequest(
+				"Admin",
+				"admin@titishop.pe",
+				"        ",
+				RolUsuario.ADMINISTRADOR,
+				EstadoUsuario.ACTIVO
+		);
+
+		mockMvc.perform(put("/api/usuarios/{id}", UUID.randomUUID())
+						.contentType("application/json")
+						.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
 	void inactivarRetorna204() throws Exception {
 		doNothing().when(usuarioService).inactivar(any(UUID.class));
 

@@ -8,6 +8,7 @@ import com.titishop.usuarios.exception.EmailUsuarioDuplicadoException;
 import com.titishop.usuarios.exception.UsuarioNoEncontradoException;
 import com.titishop.usuarios.repository.UsuarioRepository;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,7 +92,7 @@ public class UsuarioService {
 	}
 
 	private String normalizarEmail(String email) {
-		return email.trim().toLowerCase();
+		return email.trim().toLowerCase(Locale.ROOT);
 	}
 
 	private UsuarioResponse toResponse(Usuario usuario) {
