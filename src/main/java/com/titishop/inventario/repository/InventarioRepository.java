@@ -10,5 +10,9 @@ public interface InventarioRepository extends JpaRepository<Inventario, UUID> {
 
 	Optional<Inventario> findByProducto(Producto producto);
 
+	Optional<Inventario> findByProductoId(UUID productoId);
+
 	boolean existsByProducto(Producto producto);
+
+	boolean existsByProductoId(UUID productoId);
 }
