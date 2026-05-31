@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -38,4 +39,56 @@ public class Inventario extends AuditoriaEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
 	private EstadoInventario estado = EstadoInventario.ACTIVO;
+
+	protected Inventario() {
+	}
+
+	public Inventario(Producto producto, Integer stockActual, Integer stockMinimo, String ubicacion) {
+		this.producto = producto;
+		this.stockActual = stockActual;
+		this.stockMinimo = stockMinimo;
+		this.ubicacion = ubicacion;
+		this.estado = EstadoInventario.ACTIVO;
+	}
+
+	public UUID getId() {
+		return id;
+	}
+
+	public Producto getProducto() {
+		return producto;
+	}
+
+	public Integer getStockActual() {
+		return stockActual;
+	}
+
+	public Integer getStockMinimo() {
+		return stockMinimo;
+	}
+
+	public String getUbicacion() {
+		return ubicacion;
+	}
+
+	public EstadoInventario getEstado() {
+		return estado;
+	}
+
+	public void actualizar(Integer stockMinimo, String ubicacion, EstadoInventario estado) {
+		this.stockMinimo = stockMinimo;
+		this.ubicacion = ubicacion;
+		this.estado = estado;
+		setActualizadoEn(Instant.now());
+	}
+
+	public void inactivar() {
+		this.estado = EstadoInventario.INACTIVO;
+		setInactivadoEn(Instant.now());
+		setActualizadoEn(Instant.now());
+	}
+
+	public boolean esStockCritico() {
+		return stockActual <= stockMinimo;
+	}
 }
