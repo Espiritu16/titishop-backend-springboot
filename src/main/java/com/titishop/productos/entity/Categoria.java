@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -24,4 +25,36 @@ public class Categoria extends AuditoriaEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
 	private EstadoCatalogo estado = EstadoCatalogo.ACTIVO;
+
+	protected Categoria() {
+	}
+
+	public Categoria(String nombre) {
+		this.nombre = nombre;
+		this.estado = EstadoCatalogo.ACTIVO;
+	}
+
+	public UUID getId() {
+		return id;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public EstadoCatalogo getEstado() {
+		return estado;
+	}
+
+	public void actualizar(String nombre, EstadoCatalogo estado) {
+		this.nombre = nombre;
+		this.estado = estado;
+		setActualizadoEn(Instant.now());
+	}
+
+	public void inactivar() {
+		this.estado = EstadoCatalogo.INACTIVO;
+		setInactivadoEn(Instant.now());
+		setActualizadoEn(Instant.now());
+	}
 }

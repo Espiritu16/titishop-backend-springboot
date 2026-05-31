@@ -24,4 +24,16 @@ public class Marca extends AuditoriaEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
 	private EstadoCatalogo estado = EstadoCatalogo.ACTIVO;
+
+	public UUID getId() {
+		return id;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public EstadoCatalogo getEstado() {
+		return estado;
+	}
 }

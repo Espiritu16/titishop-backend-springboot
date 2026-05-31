@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ProductoRepository extends JpaRepository<Producto, UUID> {
 
 	boolean existsBySkuIgnoreCase(String sku);
+
+	boolean existsBySkuIgnoreCaseAndIdNot(String sku, UUID id);
 }

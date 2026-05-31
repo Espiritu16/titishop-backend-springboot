@@ -13,6 +13,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -52,4 +53,97 @@ public class Producto extends AuditoriaEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
 	private EstadoProducto estado = EstadoProducto.ACTIVO;
+
+	protected Producto() {
+	}
+
+	public Producto(
+			String nombre,
+			String sku,
+			String descripcion,
+			String imagenUrl,
+			Categoria categoria,
+			Marca marca,
+			BigDecimal precioCompra,
+			BigDecimal precioVenta
+	) {
+		this.nombre = nombre;
+		this.sku = sku;
+		this.descripcion = descripcion;
+		this.imagenUrl = imagenUrl;
+		this.categoria = categoria;
+		this.marca = marca;
+		this.precioCompra = precioCompra;
+		this.precioVenta = precioVenta;
+		this.estado = EstadoProducto.ACTIVO;
+	}
+
+	public UUID getId() {
+		return id;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public String getSku() {
+		return sku;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public String getImagenUrl() {
+		return imagenUrl;
+	}
+
+	public Categoria getCategoria() {
+		return categoria;
+	}
+
+	public Marca getMarca() {
+		return marca;
+	}
+
+	public BigDecimal getPrecioCompra() {
+		return precioCompra;
+	}
+
+	public BigDecimal getPrecioVenta() {
+		return precioVenta;
+	}
+
+	public EstadoProducto getEstado() {
+		return estado;
+	}
+
+	public void actualizar(
+			String nombre,
+			String sku,
+			String descripcion,
+			String imagenUrl,
+			Categoria categoria,
+			Marca marca,
+			BigDecimal precioCompra,
+			BigDecimal precioVenta,
+			EstadoProducto estado
+	) {
+		this.nombre = nombre;
+		this.sku = sku;
+		this.descripcion = descripcion;
+		this.imagenUrl = imagenUrl;
+		this.categoria = categoria;
+		this.marca = marca;
+		this.precioCompra = precioCompra;
+		this.precioVenta = precioVenta;
+		this.estado = estado;
+		setActualizadoEn(Instant.now());
+	}
+
+	public void inactivar() {
+		this.estado = EstadoProducto.INACTIVO;
+		setInactivadoEn(Instant.now());
+		setActualizadoEn(Instant.now());
+	}
 }

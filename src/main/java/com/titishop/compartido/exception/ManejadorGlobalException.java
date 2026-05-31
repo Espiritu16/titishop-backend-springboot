@@ -1,6 +1,11 @@
 package com.titishop.compartido.exception;
 
 import com.titishop.compartido.response.ErrorResponse;
+import com.titishop.productos.exception.CategoriaNoEncontradaException;
+import com.titishop.productos.exception.MarcaNoEncontradaException;
+import com.titishop.productos.exception.NombreCategoriaDuplicadoException;
+import com.titishop.productos.exception.ProductoNoEncontradoException;
+import com.titishop.productos.exception.SkuDuplicadoException;
 import com.titishop.usuarios.exception.EmailUsuarioDuplicadoException;
 import com.titishop.usuarios.exception.UsuarioNoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +28,16 @@ public class ManejadorGlobalException {
 
 	@ExceptionHandler(EmailUsuarioDuplicadoException.class)
 	ResponseEntity<ErrorResponse> manejarEmailDuplicado(EmailUsuarioDuplicadoException ex, HttpServletRequest request) {
+		return build(HttpStatus.CONFLICT, ex.getMessage(), request, List.of());
+	}
+
+	@ExceptionHandler({CategoriaNoEncontradaException.class, ProductoNoEncontradoException.class, MarcaNoEncontradaException.class})
+	ResponseEntity<ErrorResponse> manejarRecursoNoEncontrado(RuntimeException ex, HttpServletRequest request) {
+		return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, List.of());
+	}
+
+	@ExceptionHandler({SkuDuplicadoException.class, NombreCategoriaDuplicadoException.class})
+	ResponseEntity<ErrorResponse> manejarDuplicados(RuntimeException ex, HttpServletRequest request) {
 		return build(HttpStatus.CONFLICT, ex.getMessage(), request, List.of());
 	}
 
