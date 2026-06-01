@@ -3,6 +3,7 @@ package com.titishop.autenticacion.security;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -22,13 +23,14 @@ public class JwtService {
 		this.jwtProperties = jwtProperties;
 	}
 
-	public String generarToken(String email, String nombreCompleto, String rol, Instant emitidoEn) {
+	public String generarToken(UUID usuarioId, String email, String nombreCompleto, String rol, Instant emitidoEn) {
 		Instant expiraEn = calcularExpiracion(emitidoEn);
 		JwtClaimsSet claims = JwtClaimsSet.builder()
 				.issuer(jwtProperties.getIssuer())
 				.issuedAt(emitidoEn)
 				.expiresAt(expiraEn)
 				.subject(email)
+				.claim("usuarioId", usuarioId.toString())
 				.claim("nombreCompleto", nombreCompleto)
 				.claim("rol", rol)
 				.claim("authorities", List.of("ROLE_" + rol))

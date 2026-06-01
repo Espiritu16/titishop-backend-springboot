@@ -2,6 +2,7 @@ package com.titishop.compartido.entity;
 
 import com.titishop.usuarios.entity.Usuario;
 import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -9,6 +10,7 @@ import jakarta.persistence.MappedSuperclass;
 import java.time.Instant;
 
 @MappedSuperclass
+@EntityListeners(AuditoriaEntityListener.class)
 public abstract class AuditoriaEntity {
 
 	@Column(name = "creado_en", nullable = false)
@@ -56,11 +58,27 @@ public abstract class AuditoriaEntity {
 		return inactivadoPor;
 	}
 
+	public void setCreadoEn(Instant creadoEn) {
+		this.creadoEn = creadoEn;
+	}
+
 	public void setActualizadoEn(Instant actualizadoEn) {
 		this.actualizadoEn = actualizadoEn;
 	}
 
 	public void setInactivadoEn(Instant inactivadoEn) {
 		this.inactivadoEn = inactivadoEn;
+	}
+
+	public void setCreadoPor(Usuario creadoPor) {
+		this.creadoPor = creadoPor;
+	}
+
+	public void setActualizadoPor(Usuario actualizadoPor) {
+		this.actualizadoPor = actualizadoPor;
+	}
+
+	public void setInactivadoPor(Usuario inactivadoPor) {
+		this.inactivadoPor = inactivadoPor;
 	}
 }

@@ -38,7 +38,7 @@ public class AutenticacionService {
 				.orElseThrow();
 		Instant emitidoEn = Instant.now();
 		String rol = usuario.getRol().name();
-		String token = jwtService.generarToken(usuario.getEmail(), usuario.getNombreCompleto(), rol, emitidoEn);
+		String token = jwtService.generarToken(usuario.getId(), usuario.getEmail(), usuario.getNombreCompleto(), rol, emitidoEn);
 
 		return new LoginResponse(
 				token,
