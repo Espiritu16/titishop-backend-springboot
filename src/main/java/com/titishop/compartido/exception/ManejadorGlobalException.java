@@ -10,9 +10,15 @@ import com.titishop.productos.exception.NombreCategoriaDuplicadoException;
 import com.titishop.productos.exception.NombreMarcaDuplicadoException;
 import com.titishop.productos.exception.ProductoNoEncontradoException;
 import com.titishop.productos.exception.SkuDuplicadoException;
+import com.titishop.proveedores.exception.EmailProveedorDuplicadoException;
+import com.titishop.proveedores.exception.FactilizaDocumentoNoEncontradoException;
+import com.titishop.proveedores.exception.FactilizaServicioNoDisponibleException;
+import com.titishop.proveedores.exception.ProveedorNoEncontradoException;
+import com.titishop.proveedores.exception.RucProveedorDuplicadoException;
 import com.titishop.usuarios.exception.EmailUsuarioDuplicadoException;
 import com.titishop.usuarios.exception.UsuarioNoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -35,7 +41,13 @@ public class ManejadorGlobalException {
 		return build(HttpStatus.CONFLICT, ex.getMessage(), request, List.of());
 	}
 
-	@ExceptionHandler({CategoriaNoEncontradaException.class, ProductoNoEncontradoException.class, MarcaNoEncontradaException.class})
+	@ExceptionHandler({
+			CategoriaNoEncontradaException.class,
+			ProductoNoEncontradoException.class,
+			MarcaNoEncontradaException.class,
+			ProveedorNoEncontradoException.class,
+			FactilizaDocumentoNoEncontradoException.class
+	})
 	ResponseEntity<ErrorResponse> manejarRecursoNoEncontrado(RuntimeException ex, HttpServletRequest request) {
 		return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, List.of());
 	}
@@ -45,9 +57,20 @@ public class ManejadorGlobalException {
 		return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, List.of());
 	}
 
-	@ExceptionHandler({SkuDuplicadoException.class, NombreCategoriaDuplicadoException.class, NombreMarcaDuplicadoException.class})
+	@ExceptionHandler({
+			SkuDuplicadoException.class,
+			NombreCategoriaDuplicadoException.class,
+			NombreMarcaDuplicadoException.class,
+			RucProveedorDuplicadoException.class,
+			EmailProveedorDuplicadoException.class
+	})
 	ResponseEntity<ErrorResponse> manejarDuplicados(RuntimeException ex, HttpServletRequest request) {
 		return build(HttpStatus.CONFLICT, ex.getMessage(), request, List.of());
+	}
+
+	@ExceptionHandler(FactilizaServicioNoDisponibleException.class)
+	ResponseEntity<ErrorResponse> manejarFactilizaNoDisponible(FactilizaServicioNoDisponibleException ex, HttpServletRequest request) {
+		return build(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request, List.of());
 	}
 
 	@ExceptionHandler(InventarioDuplicadoPorProductoException.class)
@@ -64,6 +87,14 @@ public class ManejadorGlobalException {
 	ResponseEntity<ErrorResponse> manejarValidacion(MethodArgumentNotValidException ex, HttpServletRequest request) {
 		List<String> details = ex.getBindingResult().getFieldErrors().stream()
 				.map(this::formatearErrorCampo)
+				.toList();
+		return build(HttpStatus.BAD_REQUEST, "Error de validacion.", request, details);
+	}
+
+	@ExceptionHandler(ConstraintViolationException.class)
+	ResponseEntity<ErrorResponse> manejarViolacionRestriccion(ConstraintViolationException ex, HttpServletRequest request) {
+		List<String> details = ex.getConstraintViolations().stream()
+				.map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
 				.toList();
 		return build(HttpStatus.BAD_REQUEST, "Error de validacion.", request, details);
 	}

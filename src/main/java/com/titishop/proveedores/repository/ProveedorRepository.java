@@ -8,5 +8,9 @@ public interface ProveedorRepository extends JpaRepository<Proveedor, UUID> {
 
 	boolean existsByRuc(String ruc);
 
+	boolean existsByRucAndIdNot(String ruc, UUID id);
+
 	boolean existsByEmailIgnoreCase(String email);
+
+	boolean existsByEmailIgnoreCaseAndIdNot(String email, UUID id);
 }
