@@ -2,6 +2,7 @@ package com.titishop.compartido.exception;
 
 import com.titishop.compartido.response.ErrorResponse;
 import com.titishop.inventario.exception.InventarioDuplicadoPorProductoException;
+import com.titishop.inventario.exception.InventarioInvalidoException;
 import com.titishop.inventario.exception.InventarioNoEncontradoException;
 import com.titishop.inventario.exception.ProductoInactivoParaInventarioException;
 import com.titishop.movimientos.exception.MovimientoInvalidoException;
@@ -11,9 +12,12 @@ import com.titishop.movimientos.exception.ProveedorInactivoParaEntradaException;
 import com.titishop.movimientos.exception.ProveedorRequeridoParaEntradaException;
 import com.titishop.movimientos.exception.StockInsuficienteException;
 import com.titishop.productos.exception.CategoriaNoEncontradaException;
+import com.titishop.productos.exception.CategoriaInactivaParaProductoException;
+import com.titishop.productos.exception.MarcaInactivaParaProductoException;
 import com.titishop.productos.exception.MarcaNoEncontradaException;
 import com.titishop.productos.exception.NombreCategoriaDuplicadoException;
 import com.titishop.productos.exception.NombreMarcaDuplicadoException;
+import com.titishop.productos.exception.ProductoInvalidoException;
 import com.titishop.productos.exception.ProductoNoEncontradoException;
 import com.titishop.productos.exception.SkuDuplicadoException;
 import com.titishop.proveedores.exception.EmailProveedorDuplicadoException;
@@ -91,8 +95,12 @@ public class ManejadorGlobalException {
 	}
 
 	@ExceptionHandler({
+			CategoriaInactivaParaProductoException.class,
+			InventarioInvalidoException.class,
+			MarcaInactivaParaProductoException.class,
 			MovimientoInvalidoException.class,
 			MovimientoYaAnuladoException.class,
+			ProductoInvalidoException.class,
 			ProveedorInactivoParaEntradaException.class,
 			ProveedorRequeridoParaEntradaException.class,
 			StockInsuficienteException.class

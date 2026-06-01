@@ -11,6 +11,9 @@ import com.titishop.productos.dto.EstadoProducto;
 import com.titishop.productos.entity.Categoria;
 import com.titishop.productos.entity.Marca;
 import com.titishop.productos.entity.Producto;
+import com.titishop.productos.exception.CategoriaInactivaParaProductoException;
+import com.titishop.productos.exception.MarcaInactivaParaProductoException;
+import com.titishop.productos.exception.ProductoInvalidoException;
 import com.titishop.productos.exception.ProductoNoEncontradoException;
 import com.titishop.productos.exception.SkuDuplicadoException;
 import com.titishop.productos.repository.CategoriaRepository;
@@ -65,6 +68,52 @@ class ProductoServiceTests {
 
 		assertThatThrownBy(() -> productoService.actualizar(id, request))
 				.isInstanceOf(ProductoNoEncontradoException.class);
+	}
+
+	@Test
+	void crearFallaSiCategoriaEstaInactiva() {
+		UUID categoriaId = UUID.randomUUID();
+		UUID marcaId = UUID.randomUUID();
+		CrearProductoRequest request = new CrearProductoRequest(
+				"Mouse", "sku-cat", "Optico", null, categoriaId, marcaId, BigDecimal.ONE, BigDecimal.TEN
+		);
+		Categoria categoria = new Categoria("Perifericos");
+		ReflectionTestUtils.setField(categoria, "estado", com.titishop.productos.entity.EstadoCatalogo.INACTIVO);
+
+		when(productoRepository.existsBySkuIgnoreCase("SKU-CAT")).thenReturn(false);
+		when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+
+		assertThatThrownBy(() -> productoService.crear(request))
+				.isInstanceOf(CategoriaInactivaParaProductoException.class);
+	}
+
+	@Test
+	void crearFallaSiMarcaEstaInactiva() {
+		UUID categoriaId = UUID.randomUUID();
+		UUID marcaId = UUID.randomUUID();
+		CrearProductoRequest request = new CrearProductoRequest(
+				"Mouse", "sku-marca", "Optico", null, categoriaId, marcaId, BigDecimal.ONE, BigDecimal.TEN
+		);
+		Categoria categoria = new Categoria("Perifericos");
+		Marca marca = new Marca("Logi");
+		ReflectionTestUtils.setField(marca, "estado", com.titishop.productos.entity.EstadoCatalogo.INACTIVO);
+
+		when(productoRepository.existsBySkuIgnoreCase("SKU-MARCA")).thenReturn(false);
+		when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+		when(marcaRepository.findById(marcaId)).thenReturn(Optional.of(marca));
+
+		assertThatThrownBy(() -> productoService.crear(request))
+				.isInstanceOf(MarcaInactivaParaProductoException.class);
+	}
+
+	@Test
+	void crearFallaSiPrecioVentaEsMenorQueCompra() {
+		CrearProductoRequest request = new CrearProductoRequest(
+				"Mouse", "sku-precio", "Optico", null, UUID.randomUUID(), UUID.randomUUID(), BigDecimal.TEN, BigDecimal.ONE
+		);
+
+		assertThatThrownBy(() -> productoService.crear(request))
+				.isInstanceOf(ProductoInvalidoException.class);
 	}
 
 	@Test

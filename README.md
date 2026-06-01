@@ -17,7 +17,7 @@ Centralizar las operaciones del negocio con una arquitectura modular y mantenibl
 
 `Autenticacion -> Catalogos -> Inventario -> Movimientos -> Reportes -> Panel`
 
-El proyecto actualmente deja preparada la estructura por funcionalidades, entidades, repositorios, servicios, controladores, DTOs, seguridad JWT y documentacion inicial de base de datos.
+El proyecto implementa la estructura por funcionalidades, entidades, repositorios, servicios, controladores, DTOs, seguridad JWT, migraciones Flyway, semilla inicial, auditoria, validaciones de negocio, reportes y panel.
 
 ## 3. Arquitectura y stack
 | Stack | Descripcion |
@@ -29,7 +29,7 @@ El proyecto actualmente deja preparada la estructura por funcionalidades, entida
 | Spring Security | Autenticacion, autorizacion y proteccion de endpoints. |
 | OAuth2 Resource Server | Validacion de JWT Bearer. |
 | MySQL 8+ | Motor de base de datos relacional objetivo. |
-| Flyway | Gestion esperada de migraciones de esquema. |
+| Flyway | Migraciones versionadas de esquema y datos semilla. |
 | Springdoc OpenAPI | Documentacion interactiva de la API. |
 | JUnit 5 | Pruebas automatizadas. |
 
@@ -65,9 +65,12 @@ titishop-backend-springboot/
 │   │   └── resources/
 │   │       ├── Base de datos/
 │   │       │   └── creacion-base-datos.md
+│   │       ├── db/migration/
+│   │       │   ├── V1__crear_esquema_titishop.sql
+│   │       │   └── V2__sembrar_usuario_administrador.sql
 │   │       └── application.properties
 │   └── test/
-│       └── java/com/titishop/       # Pruebas de estructura, seguridad y entidades
+│       └── java/com/titishop/       # Pruebas unitarias, controladores e integracion
 ├── pom.xml
 ├── mvnw
 └── README.md
@@ -96,7 +99,7 @@ titishop-backend-springboot/
   - registran producto, proveedor opcional, cantidad, motivo, stock antes y stock despues;
   - no se editan ni se inactivan, se anulan con datos de anulacion.
 - Las entidades modificables heredan auditoria comun: `creado_en`, `creado_por`, `actualizado_en`, `actualizado_por`, `inactivado_en`, `inactivado_por`.
-- La logica de negocio final se debe implementar en servicios, manteniendo el flujo `controller -> service -> repository`.
+- La logica de negocio se implementa en servicios, manteniendo el flujo `controller -> service -> repository`.
 
 ## 8. API principal
 Base URL actual: `/api`
@@ -104,13 +107,15 @@ Base URL actual: `/api`
 | Modulo | Metodo | Endpoint | Estado |
 |---|---|---|---|
 | Autenticacion | `POST` | `/api/autenticacion/login` | Implementado |
-| Usuarios | Pendiente | `/api/usuarios` | Estructura creada |
-| Productos | Pendiente | `/api/productos` | Estructura creada |
-| Proveedores | Pendiente | `/api/proveedores` | Estructura creada |
-| Inventario | Pendiente | `/api/inventario` | Estructura creada |
-| Movimientos | Pendiente | `/api/movimientos` | Estructura creada |
-| Reportes | Pendiente | `/api/reportes` | Estructura creada |
-| Panel | Pendiente | `/api/panel` | Estructura creada |
+| Usuarios | CRUD | `/api/usuarios` | Implementado |
+| Categorias | CRUD | `/api/categorias` | Implementado |
+| Marcas | CRUD | `/api/marcas` | Implementado |
+| Productos | CRUD | `/api/productos` | Implementado |
+| Proveedores | CRUD / Factiliza | `/api/proveedores` | Implementado |
+| Inventario | CRUD | `/api/inventario` | Implementado |
+| Movimientos | Registro / anulacion | `/api/movimientos` | Implementado |
+| Reportes | Consulta | `/api/reportes` | Implementado |
+| Panel | Consulta | `/api/panel` | Implementado |
 
 Documentacion interactiva esperada con Springdoc:
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
@@ -129,7 +134,9 @@ Documentacion interactiva esperada con Springdoc:
   - `/v3/api-docs/**`
 - Rutas protegidas:
   - `/api/usuarios/**`: requiere rol `ADMINISTRADOR`.
+  - `/api/categorias/**`, `/api/marcas/**`, `/api/productos/**`, `/api/proveedores/**`, `/api/inventario/**`, `/api/movimientos/**`: requiere rol `ADMINISTRADOR` o `ALMACENERO`.
   - `/api/reportes/**`: requiere rol `ADMINISTRADOR` o `SUPERVISOR`.
+  - `/api/panel/**`: requiere rol `ADMINISTRADOR` o `SUPERVISOR`.
   - cualquier otra ruta requiere autenticacion.
 
 ## 10. Roles y permisos previstos
@@ -163,6 +170,14 @@ spring.jpa.hibernate.ddl-auto=none
 spring.flyway.enabled=true
 app.jwt.issuer=titishop-backend
 app.jwt.expiration-minutes=120
+```
+
+Usuario administrador semilla:
+
+```text
+email: admin@titishop.pe
+password: Admin123456!
+rol: ADMINISTRADOR
 ```
 
 ## 12. Ejecucion local

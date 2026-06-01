@@ -5,6 +5,7 @@ import com.titishop.inventario.dto.CrearInventarioRequest;
 import com.titishop.inventario.dto.InventarioResponse;
 import com.titishop.inventario.entity.Inventario;
 import com.titishop.inventario.exception.InventarioDuplicadoPorProductoException;
+import com.titishop.inventario.exception.InventarioInvalidoException;
 import com.titishop.inventario.exception.InventarioNoEncontradoException;
 import com.titishop.inventario.exception.ProductoInactivoParaInventarioException;
 import com.titishop.inventario.repository.InventarioRepository;
@@ -42,6 +43,8 @@ public class InventarioService {
 	}
 
 	public InventarioResponse crear(CrearInventarioRequest request) {
+		validarStockNoNegativo(request.stockActual(), "El stock actual no puede ser negativo.");
+		validarStockNoNegativo(request.stockMinimo(), "El stock minimo no puede ser negativo.");
 		Producto producto = buscarProductoActivo(request.productoId());
 
 		if (inventarioRepository.existsByProductoId(request.productoId())) {
@@ -59,6 +62,7 @@ public class InventarioService {
 	}
 
 	public InventarioResponse actualizar(UUID id, ActualizarInventarioRequest request) {
+		validarStockNoNegativo(request.stockMinimo(), "El stock minimo no puede ser negativo.");
 		Inventario inventario = buscarPorId(id);
 		inventario.actualizar(
 				request.stockMinimo(),
@@ -70,8 +74,17 @@ public class InventarioService {
 
 	public void inactivar(UUID id) {
 		Inventario inventario = buscarPorId(id);
+		if (inventario.getStockActual() > 0) {
+			throw new InventarioInvalidoException("No se puede inactivar inventario con stock disponible.");
+		}
 		inventario.inactivar();
 		inventarioRepository.save(inventario);
+	}
+
+	private void validarStockNoNegativo(Integer stock, String mensaje) {
+		if (stock == null || stock < 0) {
+			throw new InventarioInvalidoException(mensaje);
+		}
 	}
 
 	private Inventario buscarPorId(UUID id) {
