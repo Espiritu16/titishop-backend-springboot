@@ -39,7 +39,16 @@ public class SeguridadConfig {
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/api/autenticacion/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
 						.requestMatchers("/api/usuarios/**").hasRole("ADMINISTRADOR")
+						.requestMatchers(
+								"/api/categorias/**",
+								"/api/marcas/**",
+								"/api/productos/**",
+								"/api/proveedores/**",
+								"/api/inventario/**",
+								"/api/movimientos/**"
+						).hasAnyRole("ADMINISTRADOR", "ALMACENERO")
 						.requestMatchers("/api/reportes/**").hasAnyRole("ADMINISTRADOR", "SUPERVISOR")
+						.requestMatchers("/api/panel/**").hasAnyRole("ADMINISTRADOR", "SUPERVISOR")
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
 				.build();
