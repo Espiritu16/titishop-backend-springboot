@@ -10,12 +10,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.titishop.compartido.exception.ManejadorGlobalException;
 import com.titishop.productos.controller.CategoriaController;
+import com.titishop.productos.controller.MarcaController;
 import com.titishop.productos.controller.ProductoController;
 import com.titishop.productos.dto.CrearCategoriaRequest;
+import com.titishop.productos.dto.CrearMarcaRequest;
 import com.titishop.productos.dto.CrearProductoRequest;
 import com.titishop.productos.dto.EstadoProducto;
 import com.titishop.productos.dto.ProductoResponse;
 import com.titishop.productos.service.CategoriaService;
+import com.titishop.productos.service.MarcaService;
 import com.titishop.productos.service.ProductoService;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -32,12 +35,14 @@ class ProductoCategoriaControllerTests {
 	private MockMvc mockMvc;
 	private ProductoService productoService;
 	private CategoriaService categoriaService;
+	private MarcaService marcaService;
 	private ObjectMapper objectMapper;
 
 	@BeforeEach
 	void setUp() {
 		productoService = org.mockito.Mockito.mock(ProductoService.class);
 		categoriaService = org.mockito.Mockito.mock(CategoriaService.class);
+		marcaService = org.mockito.Mockito.mock(MarcaService.class);
 		objectMapper = new ObjectMapper();
 		objectMapper.registerModule(new JavaTimeModule());
 
@@ -46,7 +51,8 @@ class ProductoCategoriaControllerTests {
 
 		mockMvc = MockMvcBuilders.standaloneSetup(
 						new ProductoController(productoService),
-						new CategoriaController(categoriaService))
+						new CategoriaController(categoriaService),
+						new MarcaController(marcaService))
 				.setControllerAdvice(new ManejadorGlobalException())
 				.setValidator(validator)
 				.setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
@@ -87,6 +93,15 @@ class ProductoCategoriaControllerTests {
 	void crearCategoriaInvalidaRetorna400() throws Exception {
 		CrearCategoriaRequest request = new CrearCategoriaRequest("");
 		mockMvc.perform(post("/api/categorias")
+						.contentType("application/json")
+						.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void crearMarcaInvalidaRetorna400() throws Exception {
+		CrearMarcaRequest request = new CrearMarcaRequest("");
+		mockMvc.perform(post("/api/marcas")
 						.contentType("application/json")
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isBadRequest());
