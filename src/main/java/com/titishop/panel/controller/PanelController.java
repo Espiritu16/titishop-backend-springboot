@@ -1,6 +1,8 @@
 package com.titishop.panel.controller;
 
+import com.titishop.panel.dto.PanelResumenResponse;
 import com.titishop.panel.service.PanelService;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,5 +14,10 @@ public class PanelController {
 
 	public PanelController(PanelService panelService) {
 		this.panelService = panelService;
+	}
+
+	@GetMapping("/resumen")
+	public PanelResumenResponse resumen() {
+		return panelService.resumen();
 	}
 }
