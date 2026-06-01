@@ -82,6 +82,11 @@ public class Inventario extends AuditoriaEntity {
 		setActualizadoEn(Instant.now());
 	}
 
+	public void cambiarStockActual(Integer stockActual) {
+		this.stockActual = stockActual;
+		setActualizadoEn(Instant.now());
+	}
+
 	public void inactivar() {
 		this.estado = EstadoInventario.INACTIVO;
 		setInactivadoEn(Instant.now());
