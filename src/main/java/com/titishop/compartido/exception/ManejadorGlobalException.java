@@ -4,6 +4,12 @@ import com.titishop.compartido.response.ErrorResponse;
 import com.titishop.inventario.exception.InventarioDuplicadoPorProductoException;
 import com.titishop.inventario.exception.InventarioNoEncontradoException;
 import com.titishop.inventario.exception.ProductoInactivoParaInventarioException;
+import com.titishop.movimientos.exception.MovimientoInvalidoException;
+import com.titishop.movimientos.exception.MovimientoNoEncontradoException;
+import com.titishop.movimientos.exception.MovimientoYaAnuladoException;
+import com.titishop.movimientos.exception.ProveedorInactivoParaEntradaException;
+import com.titishop.movimientos.exception.ProveedorRequeridoParaEntradaException;
+import com.titishop.movimientos.exception.StockInsuficienteException;
 import com.titishop.productos.exception.CategoriaNoEncontradaException;
 import com.titishop.productos.exception.MarcaNoEncontradaException;
 import com.titishop.productos.exception.NombreCategoriaDuplicadoException;
@@ -46,6 +52,7 @@ public class ManejadorGlobalException {
 			ProductoNoEncontradoException.class,
 			MarcaNoEncontradaException.class,
 			ProveedorNoEncontradoException.class,
+			MovimientoNoEncontradoException.class,
 			FactilizaDocumentoNoEncontradoException.class
 	})
 	ResponseEntity<ErrorResponse> manejarRecursoNoEncontrado(RuntimeException ex, HttpServletRequest request) {
@@ -80,6 +87,17 @@ public class ManejadorGlobalException {
 
 	@ExceptionHandler(ProductoInactivoParaInventarioException.class)
 	ResponseEntity<ErrorResponse> manejarProductoInactivoInventario(ProductoInactivoParaInventarioException ex, HttpServletRequest request) {
+		return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request, List.of());
+	}
+
+	@ExceptionHandler({
+			MovimientoInvalidoException.class,
+			MovimientoYaAnuladoException.class,
+			ProveedorInactivoParaEntradaException.class,
+			ProveedorRequeridoParaEntradaException.class,
+			StockInsuficienteException.class
+	})
+	ResponseEntity<ErrorResponse> manejarReglaMovimiento(RuntimeException ex, HttpServletRequest request) {
 		return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request, List.of());
 	}
 

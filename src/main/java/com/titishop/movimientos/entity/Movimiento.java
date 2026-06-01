@@ -64,4 +64,90 @@ public class Movimiento {
 
 	@Column(name = "motivo_anulacion", length = 255)
 	private String motivoAnulacion;
+
+	protected Movimiento() {
+	}
+
+	public Movimiento(
+			Producto producto,
+			Proveedor proveedor,
+			TipoMovimiento tipo,
+			Integer cantidad,
+			String motivo,
+			Integer stockAntes,
+			Integer stockDespues,
+			Usuario creadoPor
+	) {
+		this.producto = producto;
+		this.proveedor = proveedor;
+		this.tipo = tipo;
+		this.cantidad = cantidad;
+		this.motivo = motivo;
+		this.stockAntes = stockAntes;
+		this.stockDespues = stockDespues;
+		this.creadoPor = creadoPor;
+		this.creadoEn = Instant.now();
+	}
+
+	public UUID getId() {
+		return id;
+	}
+
+	public Producto getProducto() {
+		return producto;
+	}
+
+	public Proveedor getProveedor() {
+		return proveedor;
+	}
+
+	public TipoMovimiento getTipo() {
+		return tipo;
+	}
+
+	public Integer getCantidad() {
+		return cantidad;
+	}
+
+	public String getMotivo() {
+		return motivo;
+	}
+
+	public Integer getStockAntes() {
+		return stockAntes;
+	}
+
+	public Integer getStockDespues() {
+		return stockDespues;
+	}
+
+	public Instant getCreadoEn() {
+		return creadoEn;
+	}
+
+	public Usuario getCreadoPor() {
+		return creadoPor;
+	}
+
+	public Instant getAnuladoEn() {
+		return anuladoEn;
+	}
+
+	public Usuario getAnuladoPor() {
+		return anuladoPor;
+	}
+
+	public String getMotivoAnulacion() {
+		return motivoAnulacion;
+	}
+
+	public boolean estaAnulado() {
+		return anuladoEn != null;
+	}
+
+	public void anular(Usuario anuladoPor, String motivoAnulacion) {
+		this.anuladoPor = anuladoPor;
+		this.motivoAnulacion = motivoAnulacion;
+		this.anuladoEn = Instant.now();
+	}
 }
