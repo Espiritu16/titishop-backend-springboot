@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -39,4 +40,74 @@ public class Proveedor extends AuditoriaEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
 	private EstadoProveedor estado = EstadoProveedor.ACTIVO;
+
+	public Proveedor() {
+	}
+
+	public Proveedor(String razonSocial, String ruc, String celular, String telefono, String email, String direccion) {
+		this.razonSocial = razonSocial;
+		this.ruc = ruc;
+		this.celular = celular;
+		this.telefono = telefono;
+		this.email = email;
+		this.direccion = direccion;
+		this.estado = EstadoProveedor.ACTIVO;
+	}
+
+	public UUID getId() {
+		return id;
+	}
+
+	public String getRazonSocial() {
+		return razonSocial;
+	}
+
+	public String getRuc() {
+		return ruc;
+	}
+
+	public String getCelular() {
+		return celular;
+	}
+
+	public String getTelefono() {
+		return telefono;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getDireccion() {
+		return direccion;
+	}
+
+	public EstadoProveedor getEstado() {
+		return estado;
+	}
+
+	public void actualizar(
+			String razonSocial,
+			String ruc,
+			String celular,
+			String telefono,
+			String email,
+			String direccion,
+			EstadoProveedor estado
+	) {
+		this.razonSocial = razonSocial;
+		this.ruc = ruc;
+		this.celular = celular;
+		this.telefono = telefono;
+		this.email = email;
+		this.direccion = direccion;
+		this.estado = estado;
+		setActualizadoEn(Instant.now());
+	}
+
+	public void inactivar() {
+		this.estado = EstadoProveedor.INACTIVO;
+		setInactivadoEn(Instant.now());
+		setActualizadoEn(Instant.now());
+	}
 }
