@@ -7,6 +7,7 @@ import com.titishop.inventario.exception.ProductoInactivoParaInventarioException
 import com.titishop.productos.exception.CategoriaNoEncontradaException;
 import com.titishop.productos.exception.MarcaNoEncontradaException;
 import com.titishop.productos.exception.NombreCategoriaDuplicadoException;
+import com.titishop.productos.exception.NombreMarcaDuplicadoException;
 import com.titishop.productos.exception.ProductoNoEncontradoException;
 import com.titishop.productos.exception.SkuDuplicadoException;
 import com.titishop.usuarios.exception.EmailUsuarioDuplicadoException;
@@ -44,7 +45,7 @@ public class ManejadorGlobalException {
 		return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, List.of());
 	}
 
-	@ExceptionHandler({SkuDuplicadoException.class, NombreCategoriaDuplicadoException.class})
+	@ExceptionHandler({SkuDuplicadoException.class, NombreCategoriaDuplicadoException.class, NombreMarcaDuplicadoException.class})
 	ResponseEntity<ErrorResponse> manejarDuplicados(RuntimeException ex, HttpServletRequest request) {
 		return build(HttpStatus.CONFLICT, ex.getMessage(), request, List.of());
 	}
