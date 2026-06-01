@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.titishop.autenticacion.security.JwtService;
 import java.time.Instant;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,10 +33,12 @@ class AutenticacionSecurityTests {
 
 	@Test
 	void jwtGeneradoIncluyeClaimsPrincipales() {
-		String token = jwtService.generarToken("admin@titishop.pe", "Admin TitiShop", "ADMINISTRADOR", Instant.now());
+		UUID usuarioId = UUID.randomUUID();
+		String token = jwtService.generarToken(usuarioId, "admin@titishop.pe", "Admin TitiShop", "ADMINISTRADOR", Instant.now());
 
 		Jwt jwt = jwtDecoder.decode(token);
 
+		assertThat(jwt.getClaimAsString("usuarioId")).isEqualTo(usuarioId.toString());
 		assertThat(jwt.getSubject()).isEqualTo("admin@titishop.pe");
 		assertThat(jwt.getClaimAsString("nombreCompleto")).isEqualTo("Admin TitiShop");
 		assertThat(jwt.getClaimAsString("rol")).isEqualTo("ADMINISTRADOR");
