@@ -118,8 +118,8 @@ Base URL actual: `/api`
 | Panel | Consulta | `/api/panel` | Implementado |
 
 Documentacion interactiva esperada con Springdoc:
-- Swagger UI: `http://localhost:8080/swagger-ui.html`
-- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+- Swagger UI: `https://api-titishop.proyectoutp.com/swagger`
+- OpenAPI JSON: `https://api-titishop.proyectoutp.com/v3/api-docs`
 
 ## 9. Seguridad
 - Autenticacion con JWT Bearer.
@@ -155,10 +155,13 @@ Documentacion interactiva esperada con Springdoc:
 Variables principales:
 
 ```env
-SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/titishop?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima
+SPRING_DATASOURCE_URL=jdbc:mysql://DB_HOST:3306/titishop?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima
 SPRING_DATASOURCE_USERNAME=usuario
 SPRING_DATASOURCE_PASSWORD=password
 JWT_SECRET=clave-segura-de-al-menos-32-bytes
+FRONTEND_PUBLIC_URL=https://titishop.proyectoutp.com
+APP_PUBLIC_URL=https://api-titishop.proyectoutp.com
+CORS_ALLOWED_ORIGINS=https://titishop.proyectoutp.com,https://www.titishop.proyectoutp.com
 ```
 
 Propiedades relevantes del proyecto:
@@ -175,8 +178,8 @@ app.jwt.expiration-minutes=120
 Usuario administrador semilla:
 
 ```text
-email: admin@titishop.pe
-password: Admin123456!
+email: kevin@gmail.com
+password: kevin123
 rol: ADMINISTRADOR
 ```
 
@@ -186,9 +189,9 @@ rol: ADMINISTRADOR
 ./mvnw spring-boot:run
 ```
 
-La API queda disponible por defecto en:
-- Aplicacion: `http://localhost:8080`
-- Swagger UI: `http://localhost:8080/swagger-ui.html`
+En produccion la API debe publicarse detras de Nginx/Cloudflare en:
+- Aplicacion: `https://api-titishop.proyectoutp.com`
+- Swagger UI: `https://api-titishop.proyectoutp.com/swagger`
 
 ## 13. Modelo logico de base de datos (TitiShop)
 ```mermaid
