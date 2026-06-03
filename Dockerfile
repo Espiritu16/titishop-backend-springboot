@@ -22,6 +22,7 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 RUN useradd -m -u 1001 springuser
+RUN mkdir -p /app/uploads && chown -R springuser:springuser /app/uploads
 
 COPY --from=builder /app/target/*.jar /app/app.jar
 
