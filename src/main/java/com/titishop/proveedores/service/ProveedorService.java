@@ -58,8 +58,8 @@ public class ProveedorService {
 		Proveedor proveedor = new Proveedor(
 				request.razonSocial().trim(),
 				ruc,
-				normalizarSoloDigitos(request.celular()),
-				normalizarSoloDigitos(request.telefono()),
+				normalizarContactoNumerico(request.celular()),
+				normalizarContactoNumerico(request.telefono()),
 				email,
 				request.direccion().trim()
 		);
@@ -75,15 +75,15 @@ public class ProveedorService {
 		if (proveedorRepository.existsByRucAndIdNot(ruc, id)) {
 			throw new RucProveedorDuplicadoException(ruc);
 		}
-		if (proveedorRepository.existsByEmailIgnoreCaseAndIdNot(email, id)) {
+		if (email != null && proveedorRepository.existsByEmailIgnoreCaseAndIdNot(email, id)) {
 			throw new EmailProveedorDuplicadoException(email);
 		}
 
 		proveedor.actualizar(
 				request.razonSocial().trim(),
 				ruc,
-				normalizarSoloDigitos(request.celular()),
-				normalizarSoloDigitos(request.telefono()),
+				normalizarContactoNumerico(request.celular()),
+				normalizarContactoNumerico(request.telefono()),
 				email,
 				request.direccion().trim(),
 				com.titishop.proveedores.entity.EstadoProveedor.valueOf(request.estado().name())
@@ -110,6 +110,9 @@ public class ProveedorService {
 	}
 
 	private void validarEmailNoRegistrado(String email) {
+		if (email == null) {
+			return;
+		}
 		if (proveedorRepository.existsByEmailIgnoreCase(email)) {
 			throw new EmailProveedorDuplicadoException(email);
 		}
@@ -119,7 +122,15 @@ public class ProveedorService {
 		return value == null ? "" : value.replaceAll("\\D", "");
 	}
 
+	private String normalizarContactoNumerico(String value) {
+		String digits = normalizarSoloDigitos(value);
+		return digits.isBlank() ? null : digits;
+	}
+
 	private String normalizarEmail(String email) {
+		if (email == null || email.isBlank()) {
+			return null;
+		}
 		return email.trim().toLowerCase(Locale.ROOT);
 	}
 

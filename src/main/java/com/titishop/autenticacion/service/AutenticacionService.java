@@ -44,6 +44,7 @@ public class AutenticacionService {
 				token,
 				"Bearer",
 				jwtService.calcularExpiracion(emitidoEn),
+				usuario.getId().toString(),
 				usuario.getNombreCompleto(),
 				usuario.getEmail(),
 				rol

@@ -45,8 +45,8 @@ public class AutenticacionController {
 							name = "Login",
 							value = """
 									{
-									  "email": "admin@titishop.com",
-									  "password": "Admin123*"
+									  "email": "kevin@gmail.com",
+									  "password": "kevin123"
 									}
 									"""
 					)

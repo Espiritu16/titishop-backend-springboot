@@ -13,7 +13,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 
-@SpringBootTest
+@SpringBootTest(properties = {
+		"spring.datasource.url=jdbc:h2:mem:autenticacion-security;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false",
+		"spring.datasource.driver-class-name=org.h2.Driver",
+		"spring.jpa.hibernate.ddl-auto=none",
+		"spring.flyway.enabled=true"
+})
 class AutenticacionSecurityTests {
 
 	@Autowired

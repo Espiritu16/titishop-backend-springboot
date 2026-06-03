@@ -5,6 +5,7 @@ import com.titishop.proveedores.exception.FactilizaDocumentoNoEncontradoExceptio
 import com.titishop.proveedores.exception.FactilizaServicioNoDisponibleException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -18,8 +19,12 @@ public class FactilizaProveedorRestClient implements FactilizaProveedorClient {
 
 	public FactilizaProveedorRestClient(FactilizaProperties properties) {
 		this.properties = properties;
+		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+		requestFactory.setConnectTimeout(properties.getConnectTimeout());
+		requestFactory.setReadTimeout(properties.getReadTimeout());
 		this.restClient = RestClient.builder()
 				.baseUrl(properties.getApiBaseUrl().replaceAll("/+$", ""))
+				.requestFactory(requestFactory)
 				.build();
 	}
 

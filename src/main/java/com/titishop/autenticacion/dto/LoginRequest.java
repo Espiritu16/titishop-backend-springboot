@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 
 @Schema(name = "LoginRequest", description = "Credenciales para autenticar un usuario en TitiShop.")
 public record LoginRequest(
-		@Schema(description = "Correo del usuario registrado.", example = "admin@titishop.com")
+		@Schema(description = "Correo del usuario registrado.", example = "kevin@gmail.com")
 		@NotBlank @Email String email,
-		@Schema(description = "Contrasena del usuario.", example = "Admin123*")
+		@Schema(description = "Contrasena del usuario.", example = "kevin123")
 		@NotBlank String password
 ) {
 }
