@@ -5,6 +5,17 @@ import com.titishop.proveedores.dto.ConsultaRucProveedorResponse;
 import com.titishop.proveedores.dto.CrearProveedorRequest;
 import com.titishop.proveedores.dto.ProveedorResponse;
 import com.titishop.proveedores.service.ProveedorService;
+import com.titishop.compartido.response.ErrorResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import java.util.List;
@@ -24,6 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Validated
 @RequestMapping("/api/proveedores")
+@Tag(name = "Proveedores", description = "Gestion y consulta de proveedores.")
+@SecurityRequirement(name = "bearerAuth")
 public class ProveedorController {
 
 	private final ProveedorService proveedorService;
@@ -33,17 +46,51 @@ public class ProveedorController {
 	}
 
 	@GetMapping
+	@Operation(summary = "Listar proveedores", description = "Obtiene todos los proveedores registrados.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Listado obtenido correctamente.",
+					content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProveedorResponse.class)))),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
+			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
 	public List<ProveedorResponse> listar() {
 		return proveedorService.listar();
 	}
 
 	@GetMapping("/{id}")
-	public ProveedorResponse obtenerPorId(@PathVariable UUID id) {
+	@Operation(summary = "Obtener proveedor por ID", description = "Busca un proveedor especifico por su identificador.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Proveedor encontrado.",
+					content = @Content(schema = @Schema(implementation = ProveedorResponse.class))),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
+			@ApiResponse(responseCode = "404", description = "Proveedor no encontrado.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	public ProveedorResponse obtenerPorId(@Parameter(description = "ID del proveedor.", example = "5a81e2d0-55f8-4a3b-8d65-febec9959002") @PathVariable UUID id) {
 		return proveedorService.obtenerPorId(id);
 	}
 
 	@GetMapping("/consulta-ruc/{ruc}")
+	@Operation(summary = "Consultar RUC", description = "Consulta datos tributarios de un proveedor a partir de su numero de RUC.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Consulta realizada correctamente.",
+					content = @Content(schema = @Schema(implementation = ConsultaRucProveedorResponse.class))),
+			@ApiResponse(responseCode = "400", description = "RUC con formato invalido.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
+			@ApiResponse(responseCode = "404", description = "RUC no encontrado en el servicio externo.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
 	public ConsultaRucProveedorResponse consultarRuc(
+			@Parameter(description = "RUC de 11 digitos a consultar.", example = "20123456789")
 			@PathVariable @Pattern(regexp = "\\d{11}", message = "ruc debe tener 11 digitos") String ruc
 	) {
 		return proveedorService.consultarRuc(ruc);
@@ -51,18 +98,101 @@ public class ProveedorController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
+	@Operation(summary = "Crear proveedor", description = "Registra un nuevo proveedor comercial.")
+	@io.swagger.v3.oas.annotations.parameters.RequestBody(
+			required = true,
+			description = "Datos del proveedor.",
+			content = @Content(
+					schema = @Schema(implementation = CrearProveedorRequest.class),
+					examples = @ExampleObject(
+							name = "Nuevo proveedor",
+							value = """
+									{
+									  "razonSocial": "Distribuidora Lima Norte SAC",
+									  "ruc": "20123456789",
+									  "celular": "987654321",
+									  "telefono": "014567890",
+									  "email": "ventas@limanorte.pe",
+									  "direccion": "Av. Los Almacenes 123, Independencia"
+									}
+									"""
+					)
+			)
+	)
+	@ApiResponses({
+			@ApiResponse(responseCode = "201", description = "Proveedor creado correctamente.",
+					content = @Content(schema = @Schema(implementation = ProveedorResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
+			@ApiResponse(responseCode = "409", description = "RUC o correo ya registrados.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
 	public ProveedorResponse crear(@Valid @RequestBody CrearProveedorRequest request) {
 		return proveedorService.crear(request);
 	}
 
 	@PutMapping("/{id}")
-	public ProveedorResponse actualizar(@PathVariable UUID id, @Valid @RequestBody ActualizarProveedorRequest request) {
+	@Operation(summary = "Actualizar proveedor", description = "Actualiza los datos operativos de un proveedor.")
+	@io.swagger.v3.oas.annotations.parameters.RequestBody(
+			required = true,
+			description = "Datos actualizados del proveedor.",
+			content = @Content(
+					schema = @Schema(implementation = ActualizarProveedorRequest.class),
+					examples = @ExampleObject(
+							name = "Actualizar proveedor",
+							value = """
+									{
+									  "razonSocial": "Distribuidora Lima Norte SAC",
+									  "ruc": "20123456789",
+									  "celular": "987654321",
+									  "telefono": "014567890",
+									  "email": "compras@limanorte.pe",
+									  "direccion": "Av. Los Almacenes 321, Independencia",
+									  "estado": "ACTIVO"
+									}
+									"""
+					)
+			)
+	)
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Proveedor actualizado correctamente.",
+					content = @Content(schema = @Schema(implementation = ProveedorResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
+			@ApiResponse(responseCode = "404", description = "Proveedor no encontrado.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "409", description = "RUC o correo ya registrados.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	public ProveedorResponse actualizar(
+			@Parameter(description = "ID del proveedor a actualizar.", example = "5a81e2d0-55f8-4a3b-8d65-febec9959002")
+			@PathVariable UUID id,
+			@Valid @RequestBody ActualizarProveedorRequest request
+	) {
 		return proveedorService.actualizar(id, request);
 	}
 
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void inactivar(@PathVariable UUID id) {
+	@Operation(summary = "Inactivar proveedor", description = "Marca un proveedor como inactivo sin eliminarlo.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "204", description = "Proveedor inactivado correctamente."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
+			@ApiResponse(responseCode = "404", description = "Proveedor no encontrado.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	public void inactivar(@Parameter(description = "ID del proveedor a inactivar.", example = "5a81e2d0-55f8-4a3b-8d65-febec9959002") @PathVariable UUID id) {
 		proveedorService.inactivar(id);
 	}
 }
