@@ -12,6 +12,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest(properties = {
+		"spring.datasource.url=jdbc:h2:mem:autorizacion-roles;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false",
+		"spring.datasource.driver-class-name=org.h2.Driver",
 		"spring.jpa.hibernate.ddl-auto=create-drop",
 		"spring.flyway.enabled=false"
 })
