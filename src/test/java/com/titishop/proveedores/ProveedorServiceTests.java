@@ -6,11 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
 
 import com.titishop.proveedores.dto.ActualizarProveedorRequest;
 import com.titishop.proveedores.dto.ConsultaRucProveedorResponse;
 import com.titishop.proveedores.dto.CrearProveedorRequest;
 import com.titishop.proveedores.dto.EstadoProveedor;
+import com.titishop.proveedores.dto.ProveedorResponse;
 import com.titishop.proveedores.entity.Proveedor;
 import com.titishop.proveedores.exception.EmailProveedorDuplicadoException;
 import com.titishop.proveedores.exception.ProveedorNoEncontradoException;
@@ -53,6 +55,27 @@ class ProveedorServiceTests {
 	}
 
 	@Test
+	void crearPermiteContactoOpcionalVacio() {
+		CrearProveedorRequest request = new CrearProveedorRequest(
+				"Proveedor Uno",
+				"20609998881",
+				"",
+				"",
+				"",
+				"Av. Uno 123"
+		);
+		when(proveedorRepository.existsByRuc("20609998881")).thenReturn(false);
+		when(proveedorRepository.save(any(Proveedor.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+		ProveedorResponse response = proveedorService.crear(request);
+
+		assertThat(response.celular()).isNull();
+		assertThat(response.telefono()).isNull();
+		assertThat(response.email()).isNull();
+		verify(proveedorRepository, never()).existsByEmailIgnoreCase(any());
+	}
+
+	@Test
 	void actualizarFallaSiEmailDuplicado() {
 		UUID id = UUID.randomUUID();
 		Proveedor proveedor = new Proveedor(
@@ -78,6 +101,38 @@ class ProveedorServiceTests {
 
 		assertThatThrownBy(() -> proveedorService.actualizar(id, request))
 				.isInstanceOf(EmailProveedorDuplicadoException.class);
+	}
+
+	@Test
+	void actualizarPermiteContactoOpcionalVacio() {
+		UUID id = UUID.randomUUID();
+		Proveedor proveedor = new Proveedor(
+				"Proveedor Uno",
+				"20609998881",
+				"987654321",
+				"014700000",
+				"ventas@uno.pe",
+				"Av. Uno 123"
+		);
+		ActualizarProveedorRequest request = new ActualizarProveedorRequest(
+				"Proveedor Uno",
+				"20609998881",
+				"",
+				"",
+				"",
+				"Av. Uno 123",
+				EstadoProveedor.ACTIVO
+		);
+
+		when(proveedorRepository.findById(id)).thenReturn(Optional.of(proveedor));
+		when(proveedorRepository.save(any(Proveedor.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+		ProveedorResponse response = proveedorService.actualizar(id, request);
+
+		assertThat(response.celular()).isNull();
+		assertThat(response.telefono()).isNull();
+		assertThat(response.email()).isNull();
+		verify(proveedorRepository, never()).existsByEmailIgnoreCaseAndIdNot(any(), eq(id));
 	}
 
 	@Test

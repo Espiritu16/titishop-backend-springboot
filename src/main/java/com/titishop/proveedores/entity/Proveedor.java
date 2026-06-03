@@ -25,13 +25,13 @@ public class Proveedor extends AuditoriaEntity {
 	@Column(nullable = false, unique = true, length = 11)
 	private String ruc;
 
-	@Column(nullable = false, length = 9)
+	@Column(length = 9)
 	private String celular;
 
-	@Column(nullable = false, length = 9)
+	@Column(length = 9)
 	private String telefono;
 
-	@Column(nullable = false, unique = true, length = 160)
+	@Column(unique = true, length = 160)
 	private String email;
 
 	@Column(nullable = false, length = 160)
