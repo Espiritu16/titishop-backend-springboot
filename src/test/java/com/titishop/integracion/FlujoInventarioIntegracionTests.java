@@ -63,8 +63,8 @@ class FlujoInventarioIntegracionTests {
 
 	@Test
 	void flujoCompletoMantieneConsistenciaDeStockConMigracionesFlyway() {
-		Usuario admin = usuarioRepository.findByEmailIgnoreCase("admin@titishop.pe").orElseThrow();
-		assertThat(passwordEncoder.matches("Admin123456!", admin.getPasswordHash())).isTrue();
+		Usuario admin = usuarioRepository.findByEmailIgnoreCase("kevin@gmail.com").orElseThrow();
+		assertThat(passwordEncoder.matches("kevin123", admin.getPasswordHash())).isTrue();
 		var categoria = categoriaService.crear(new CrearCategoriaRequest("Integracion"));
 		var marca = marcaService.crear(new CrearMarcaRequest("Marca Integracion"));
 		ProductoResponse producto = productoService.crear(new CrearProductoRequest(
