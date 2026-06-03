@@ -45,13 +45,14 @@ public class SeguridadConfig {
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
-				.csrf(csrf -> csrf.disable())
-				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth
+					.csrf(csrf -> csrf.disable())
+					.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+					.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+					.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
 								"/api/autenticacion/**",
 								"/api/proveedores/consulta-ruc/**",
+								"/uploads/**",
 								"/swagger",
 								"/swagger/**",
 								"/swagger-ui/**",
@@ -65,7 +66,8 @@ public class SeguridadConfig {
 								"/api/productos/**",
 								"/api/proveedores/**",
 								"/api/inventario/**",
-								"/api/movimientos/**"
+								"/api/movimientos/**",
+								"/api/archivos/**"
 						).hasAnyRole("ADMINISTRADOR", "ALMACENERO")
 						.requestMatchers("/api/reportes/**").hasAnyRole("ADMINISTRADOR", "SUPERVISOR")
 						.requestMatchers("/api/panel/**").hasAnyRole("ADMINISTRADOR", "SUPERVISOR")

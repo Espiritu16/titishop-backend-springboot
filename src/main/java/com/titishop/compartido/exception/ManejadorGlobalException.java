@@ -1,5 +1,6 @@
 package com.titishop.compartido.exception;
 
+import com.titishop.archivos.exception.ArchivoInvalidoException;
 import com.titishop.compartido.response.ErrorResponse;
 import com.titishop.inventario.exception.InventarioDuplicadoPorProductoException;
 import com.titishop.inventario.exception.InventarioInvalidoException;
@@ -95,6 +96,7 @@ public class ManejadorGlobalException {
 	}
 
 	@ExceptionHandler({
+			ArchivoInvalidoException.class,
 			CategoriaInactivaParaProductoException.class,
 			InventarioInvalidoException.class,
 			MarcaInactivaParaProductoException.class,
