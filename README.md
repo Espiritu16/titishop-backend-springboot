@@ -1,50 +1,59 @@
 # TitiShop Backend API
 
 ## 1. Descripcion del proyecto
-Backend del sistema TitiShop para gestion de productos, proveedores, inventario, movimientos y reportes operativos.
+Backend del sistema TitiShop para gestion operativa de inventario, productos, proveedores, usuarios, movimientos, reportes y panel administrativo.
 
-Permite preparar la base tecnica para:
-- autenticacion stateless con JWT,
-- gestion de usuarios con roles,
-- catalogo de productos con categoria, marca, imagen y descripcion,
-- control de proveedores,
-- administracion de stock por producto,
-- registro historico de movimientos de inventario,
-- consultas para reportes y panel administrativo.
+Permite:
+- autenticacion stateless con JWT Bearer,
+- autorizacion por roles de usuario,
+- gestion de productos, categorias y marcas,
+- gestion de proveedores con consulta externa de RUC,
+- carga y publicacion de imagenes de productos,
+- control de stock por producto,
+- registro y anulacion de movimientos de inventario,
+- consultas de reportes operativos,
+- resumen administrativo para dashboard,
+- migraciones versionadas de base de datos con Flyway.
 
 ## 2. Objetivo del backend
-Centralizar las operaciones del negocio con una arquitectura modular y mantenible:
+Centralizar las operaciones del negocio con una arquitectura modular y reglas de negocio consistentes:
 
-`Autenticacion -> Catalogos -> Inventario -> Movimientos -> Reportes -> Panel`
+`Autenticacion -> Catalogos -> Proveedores -> Inventario -> Movimientos -> Reportes -> Panel`
 
-El proyecto implementa la estructura por funcionalidades, entidades, repositorios, servicios, controladores, DTOs, seguridad JWT, migraciones Flyway, semilla inicial, auditoria, validaciones de negocio, reportes y panel.
+La aplicacion expone una API REST bajo `/api`, mantiene la logica de negocio en servicios, valida las entradas con DTOs y Jakarta Bean Validation, y persiste los datos en MySQL mediante Spring Data JPA.
 
 ## 3. Arquitectura y stack
 | Stack | Descripcion |
 |---|---|
 | Java 21 | Lenguaje base del backend. |
-| Spring Boot 4.0.6 | Framework principal para construir la API. |
+| Spring Boot 4.0.6 | Framework principal de la aplicacion. |
 | Spring Web MVC | Exposicion de endpoints REST. |
-| Spring Data JPA | Persistencia y mapeo de entidades. |
-| Spring Security | Autenticacion, autorizacion y proteccion de endpoints. |
-| OAuth2 Resource Server | Validacion de JWT Bearer. |
-| MySQL 8+ | Motor de base de datos relacional objetivo. |
+| Spring Data JPA | Persistencia ORM y repositorios. |
+| Spring Security | Autenticacion, autorizacion y proteccion de rutas. |
+| OAuth2 Resource Server | Validacion de tokens JWT Bearer. |
+| BCrypt | Hash de contrasenas de usuarios. |
+| MySQL 8+ | Base de datos relacional objetivo. |
 | Flyway | Migraciones versionadas de esquema y datos semilla. |
-| Springdoc OpenAPI | Documentacion interactiva de la API. |
+| Springdoc OpenAPI | Documentacion interactiva de API. |
+| H2 | Base de datos en memoria para pruebas. |
 | JUnit 5 | Pruebas automatizadas. |
 
 ## 4. Dependencias principales
 | Dependencia | Uso |
 |---|---|
 | `spring-boot-starter-webmvc` | Controladores REST y ciclo HTTP. |
-| `spring-boot-starter-data-jpa` | Repositorios JPA y persistencia ORM. |
-| `spring-boot-starter-security` | Seguridad de la aplicacion. |
-| `spring-boot-starter-oauth2-resource-server` | Validacion de tokens JWT. |
-| `spring-boot-starter-validation` | Validacion de DTOs con Jakarta Bean Validation. |
-| `springdoc-openapi-starter-webmvc-ui` | Swagger UI y especificacion OpenAPI. |
+| `spring-boot-starter-data-jpa` | Entidades, repositorios y persistencia. |
+| `spring-boot-starter-security` | Seguridad HTTP y reglas de acceso. |
+| `spring-boot-starter-oauth2-resource-server` | Validacion de JWT en requests protegidos. |
+| `spring-boot-starter-validation` | Validacion de DTOs con anotaciones Jakarta. |
+| `springdoc-openapi-starter-webmvc-ui` | Swagger UI y OpenAPI JSON. |
 | `mysql-connector-j` | Driver MySQL en tiempo de ejecucion. |
-| `flyway-core` / `flyway-mysql` | Migraciones versionadas para MySQL. |
-| `h2` | Base de datos en memoria para pruebas. |
+| `flyway-core` / `flyway-mysql` | Migraciones para MySQL. |
+| `jackson-datatype-jsr310` | Serializacion de fechas Java Time. |
+| `spring-boot-starter-test` | Base de pruebas unitarias e integracion. |
+| `spring-boot-starter-security-test` | Utilidades de pruebas de seguridad. |
+| `spring-boot-starter-webmvc-test` | Pruebas de controladores MVC. |
+| `h2` | Base de datos para pruebas automatizadas. |
 
 ## 5. Estructura del proyecto
 ```text
@@ -52,25 +61,32 @@ titishop-backend-springboot/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/titishop/
-│   │   │   ├── autenticacion/       # Login, JWT y configuracion de seguridad
-│   │   │   ├── usuarios/            # Usuarios, roles y estados
-│   │   │   ├── productos/           # Productos, categorias y marcas
-│   │   │   ├── proveedores/         # Proveedores y datos de contacto
-│   │   │   ├── inventario/          # Stock, stock minimo y ubicacion
-│   │   │   ├── movimientos/         # Entradas, salidas y ajustes
-│   │   │   ├── reportes/            # Reportes de movimientos
-│   │   │   ├── panel/               # Resumen administrativo
-│   │   │   ├── compartido/          # Configuracion, errores, auditoria y validaciones comunes
+│   │   │   ├── archivos/           # Carga y publicacion de archivos de productos
+│   │   │   ├── autenticacion/      # Login, JWT y configuracion de seguridad
+│   │   │   ├── compartido/         # Configuracion, errores, auditoria y utilidades comunes
+│   │   │   ├── inventario/         # Stock, stock minimo, ubicacion y estado
+│   │   │   ├── movimientos/        # Entradas, salidas, ajustes y anulaciones
+│   │   │   ├── panel/              # Resumen administrativo
+│   │   │   ├── productos/          # Productos, categorias y marcas
+│   │   │   ├── proveedores/        # Proveedores y consulta RUC externa
+│   │   │   ├── reportes/           # Reportes de movimientos, stock y valorizacion
+│   │   │   ├── usuarios/           # Usuarios, roles y estados
 │   │   │   └── TitishopBackendApplication.java
 │   │   └── resources/
 │   │       ├── Base de datos/
 │   │       │   └── creacion-base-datos.md
 │   │       ├── db/migration/
 │   │       │   ├── V1__crear_esquema_titishop.sql
-│   │       │   └── V2__sembrar_usuario_administrador.sql
+│   │       │   ├── V2__sembrar_usuario_administrador.sql
+│   │       │   ├── V3__actualizar_usuario_administrador_kevin.sql
+│   │       │   ├── V4__permitir_contacto_opcional_proveedores.sql
+│   │       │   └── V5__sembrar_catalogo_inventario_movimientos.sql
 │   │       └── application.properties
 │   └── test/
-│       └── java/com/titishop/       # Pruebas unitarias, controladores e integracion
+│       ├── java/com/titishop/       # Pruebas unitarias, seguridad e integracion
+│       └── resources/
+│           └── application.properties
+├── Dockerfile
 ├── pom.xml
 ├── mvnw
 └── README.md
@@ -79,75 +95,128 @@ titishop-backend-springboot/
 ## 6. Modulos funcionales
 | Modulo | Descripcion |
 |---|---|
-| `autenticacion` | Login por email/password y emision de JWT. |
-| `usuarios` | Estructura para gestion de usuarios, roles y estados. |
-| `productos` | Producto con SKU, descripcion, imagen, categoria, marca y precios. |
-| `proveedores` | Datos comerciales y de contacto de proveedores. |
-| `inventario` | Stock actual, stock minimo, ubicacion y estado por producto. |
-| `movimientos` | Historial de entradas, salidas y ajustes con stock antes/despues. |
-| `reportes` | Base para reportes sobre movimientos e inventario. |
-| `panel` | Base para resumen administrativo del sistema. |
-| `compartido` | Auditoria comun, respuestas de error, CORS y validaciones compartidas. |
+| `autenticacion` | Login por email/password, emision de JWT y datos de sesion. |
+| `usuarios` | CRUD de usuarios, roles `ADMINISTRADOR`, `ALMACENERO`, `SUPERVISOR` y estados. |
+| `productos` | CRUD de productos con SKU, descripcion, imagen, categoria, marca y precios. |
+| `productos/categorias` | Catalogo de categorias activas/inactivas. |
+| `productos/marcas` | Catalogo de marcas activas/inactivas. |
+| `proveedores` | CRUD de proveedores, validacion de RUC/email y consulta externa por RUC. |
+| `inventario` | Registro unico de inventario por producto, stock actual, stock minimo y ubicacion. |
+| `movimientos` | Registro historico de entradas, salidas, ajustes y anulacion de movimientos. |
+| `reportes` | Consultas de movimientos, stock, stock critico y valorizacion. |
+| `panel` | Indicadores administrativos para dashboard. |
+| `archivos` | Carga de imagenes de productos en formato multipart. |
+| `compartido` | Auditoria, CORS, OpenAPI, Flyway, errores globales y validaciones comunes. |
 
 ## 7. Reglas de negocio clave
-- Roles de usuario previstos: `ADMINISTRADOR`, `ALMACENERO`, `SUPERVISOR`.
-- Estados de catalogo: `ACTIVO` / `INACTIVO`.
-- El producto debe tener `nombre`, `sku`, `descripcion`, `imagen_url`, categoria, marca, precio de compra y precio de venta.
-- Inventario mantiene un registro unico por producto.
-- Movimientos son historicos:
-  - tipos validos: `ENTRADA`, `SALIDA`, `AJUSTE`;
-  - registran producto, proveedor opcional, cantidad, motivo, stock antes y stock despues;
-  - no se editan ni se inactivan, se anulan con datos de anulacion.
-- Las entidades modificables heredan auditoria comun: `creado_en`, `creado_por`, `actualizado_en`, `actualizado_por`, `inactivado_en`, `inactivado_por`.
-- La logica de negocio se implementa en servicios, manteniendo el flujo `controller -> service -> repository`.
+- Roles permitidos: `ADMINISTRADOR`, `ALMACENERO`, `SUPERVISOR`.
+- Estados de catalogo y usuarios: `ACTIVO` / `INACTIVO`.
+- La autenticacion usa JWT Bearer y sesiones stateless.
+- El secreto JWT debe tener al menos 32 bytes.
+- Los productos tienen SKU unico y deben pertenecer a una categoria y una marca.
+- El precio de venta no puede ser menor que el precio de compra.
+- El inventario mantiene un registro unico por producto.
+- El stock actual y el stock minimo no pueden ser negativos.
+- Los movimientos soportan tipos `ENTRADA`, `SALIDA` y `AJUSTE`.
+- Los movimientos guardan stock antes y stock despues para trazabilidad.
+- Las salidas no pueden dejar stock negativo.
+- Las entradas pueden asociarse a un proveedor.
+- Los movimientos historicos no se eliminan; se anulan registrando usuario, fecha y motivo.
+- Las entidades administrables heredan auditoria comun: creacion, actualizacion e inactivacion.
+- La logica de negocio se mantiene en servicios siguiendo el flujo `controller -> service -> repository`.
 
 ## 8. API principal
-Base URL actual: `/api`
+Base URL local: `http://localhost:8080/api`
 
-| Modulo | Metodo | Endpoint | Estado |
+Base URL produccion: `https://api-titishop.proyectoutp.com/api`
+
+| Modulo | Metodo | Endpoint | Acceso |
 |---|---|---|---|
-| Autenticacion | `POST` | `/api/autenticacion/login` | Implementado |
-| Usuarios | CRUD | `/api/usuarios` | Implementado |
-| Categorias | CRUD | `/api/categorias` | Implementado |
-| Marcas | CRUD | `/api/marcas` | Implementado |
-| Productos | CRUD | `/api/productos` | Implementado |
-| Proveedores | CRUD / Factiliza | `/api/proveedores` | Implementado |
-| Inventario | CRUD | `/api/inventario` | Implementado |
-| Movimientos | Registro / anulacion | `/api/movimientos` | Implementado |
-| Reportes | Consulta | `/api/reportes` | Implementado |
-| Panel | Consulta | `/api/panel` | Implementado |
+| Autenticacion | `POST` | `/api/autenticacion/login` | Publico |
+| Usuarios | `GET` | `/api/usuarios` | ADMINISTRADOR |
+| Usuarios | `GET` | `/api/usuarios/{id}` | ADMINISTRADOR |
+| Usuarios | `POST` | `/api/usuarios` | ADMINISTRADOR |
+| Usuarios | `PUT` | `/api/usuarios/{id}` | ADMINISTRADOR |
+| Usuarios | `DELETE` | `/api/usuarios/{id}` | ADMINISTRADOR |
+| Categorias | `GET` | `/api/categorias` | ADMINISTRADOR / ALMACENERO |
+| Categorias | `GET` | `/api/categorias/{id}` | ADMINISTRADOR / ALMACENERO |
+| Categorias | `POST` | `/api/categorias` | ADMINISTRADOR / ALMACENERO |
+| Categorias | `PUT` | `/api/categorias/{id}` | ADMINISTRADOR / ALMACENERO |
+| Categorias | `DELETE` | `/api/categorias/{id}` | ADMINISTRADOR / ALMACENERO |
+| Marcas | `GET` | `/api/marcas` | ADMINISTRADOR / ALMACENERO |
+| Marcas | `GET` | `/api/marcas/{id}` | ADMINISTRADOR / ALMACENERO |
+| Marcas | `POST` | `/api/marcas` | ADMINISTRADOR / ALMACENERO |
+| Marcas | `PUT` | `/api/marcas/{id}` | ADMINISTRADOR / ALMACENERO |
+| Marcas | `DELETE` | `/api/marcas/{id}` | ADMINISTRADOR / ALMACENERO |
+| Productos | `GET` | `/api/productos` | ADMINISTRADOR / ALMACENERO |
+| Productos | `GET` | `/api/productos/{id}` | ADMINISTRADOR / ALMACENERO |
+| Productos | `POST` | `/api/productos` | ADMINISTRADOR / ALMACENERO |
+| Productos | `PUT` | `/api/productos/{id}` | ADMINISTRADOR / ALMACENERO |
+| Productos | `DELETE` | `/api/productos/{id}` | ADMINISTRADOR / ALMACENERO |
+| Proveedores | `GET` | `/api/proveedores` | ADMINISTRADOR / ALMACENERO |
+| Proveedores | `GET` | `/api/proveedores/{id}` | ADMINISTRADOR / ALMACENERO |
+| Proveedores | `GET` | `/api/proveedores/consulta-ruc/{ruc}` | Publico |
+| Proveedores | `POST` | `/api/proveedores` | ADMINISTRADOR / ALMACENERO |
+| Proveedores | `PUT` | `/api/proveedores/{id}` | ADMINISTRADOR / ALMACENERO |
+| Proveedores | `DELETE` | `/api/proveedores/{id}` | ADMINISTRADOR / ALMACENERO |
+| Inventario | `GET` | `/api/inventario` | ADMINISTRADOR / ALMACENERO |
+| Inventario | `GET` | `/api/inventario/{id}` | ADMINISTRADOR / ALMACENERO |
+| Inventario | `POST` | `/api/inventario` | ADMINISTRADOR / ALMACENERO |
+| Inventario | `PUT` | `/api/inventario/{id}` | ADMINISTRADOR / ALMACENERO |
+| Inventario | `DELETE` | `/api/inventario/{id}` | ADMINISTRADOR / ALMACENERO |
+| Movimientos | `GET` | `/api/movimientos` | ADMINISTRADOR / ALMACENERO |
+| Movimientos | `GET` | `/api/movimientos/{id}` | ADMINISTRADOR / ALMACENERO |
+| Movimientos | `POST` | `/api/movimientos` | ADMINISTRADOR / ALMACENERO |
+| Movimientos | `POST` | `/api/movimientos/{id}/anulacion` | ADMINISTRADOR / ALMACENERO |
+| Reportes | `GET` | `/api/reportes/movimientos` | ADMINISTRADOR / SUPERVISOR |
+| Reportes | `GET` | `/api/reportes/stock` | ADMINISTRADOR / SUPERVISOR |
+| Reportes | `GET` | `/api/reportes/stock-critico` | ADMINISTRADOR / SUPERVISOR |
+| Reportes | `GET` | `/api/reportes/valorizacion` | ADMINISTRADOR / SUPERVISOR |
+| Panel | `GET` | `/api/panel/resumen` | ADMINISTRADOR / SUPERVISOR |
+| Archivos | `POST` | `/api/archivos/productos` | ADMINISTRADOR / ALMACENERO |
+| Swagger | `GET` | `/swagger` | Publico |
+| OpenAPI | `GET` | `/v3/api-docs` | Publico cuando Springdoc esta habilitado |
 
-Documentacion interactiva esperada con Springdoc:
-- Swagger UI: `https://api-titishop.proyectoutp.com/swagger`
-- OpenAPI JSON: `https://api-titishop.proyectoutp.com/v3/api-docs`
+Documentacion interactiva:
+- Swagger UI local: `http://localhost:8080/swagger`
+- Swagger UI produccion: `https://api-titishop.proyectoutp.com/swagger`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 
 ## 9. Seguridad
 - Autenticacion con JWT Bearer.
-- Sesiones deshabilitadas: politica stateless.
+- Politica de sesion `STATELESS`.
 - CSRF deshabilitado para API REST.
-- Password hashing con BCrypt.
-- `JWT_SECRET` se lee desde variable de entorno.
+- Password hashing con `BCryptPasswordEncoder`.
+- CORS configurable por variable `CORS_ALLOWED_ORIGINS`.
+- Validacion de autoridades desde el claim JWT `authorities`.
 - Rutas publicas:
   - `/api/autenticacion/**`
+  - `/api/proveedores/consulta-ruc/**`
+  - `/uploads/**`
+  - `/swagger`
+  - `/swagger/**`
   - `/swagger-ui/**`
   - `/swagger-ui.html`
   - `/v3/api-docs/**`
 - Rutas protegidas:
-  - `/api/usuarios/**`: requiere rol `ADMINISTRADOR`.
-  - `/api/categorias/**`, `/api/marcas/**`, `/api/productos/**`, `/api/proveedores/**`, `/api/inventario/**`, `/api/movimientos/**`: requiere rol `ADMINISTRADOR` o `ALMACENERO`.
-  - `/api/reportes/**`: requiere rol `ADMINISTRADOR` o `SUPERVISOR`.
-  - `/api/panel/**`: requiere rol `ADMINISTRADOR` o `SUPERVISOR`.
+  - `/api/usuarios/**`: requiere `ADMINISTRADOR`.
+  - `/api/categorias/**`, `/api/marcas/**`, `/api/productos/**`, `/api/proveedores/**`, `/api/inventario/**`, `/api/movimientos/**`, `/api/archivos/**`: requieren `ADMINISTRADOR` o `ALMACENERO`.
+  - `/api/reportes/**`, `/api/panel/**`: requieren `ADMINISTRADOR` o `SUPERVISOR`.
   - cualquier otra ruta requiere autenticacion.
 
-## 10. Roles y permisos previstos
+## 10. Roles y permisos
 | Accion | ADMINISTRADOR | ALMACENERO | SUPERVISOR |
 |---|---|---|---|
 | Iniciar sesion | Si | Si | Si |
 | Gestionar usuarios | Si | No | No |
+| Gestionar categorias y marcas | Si | Si | No |
 | Gestionar productos | Si | Si | No |
 | Gestionar proveedores | Si | Si | No |
+| Consultar RUC de proveedor | Si | Si | Si |
 | Gestionar inventario | Si | Si | No |
 | Registrar movimientos | Si | Si | No |
+| Anular movimientos | Si | Si | No |
+| Cargar imagenes de productos | Si | Si | No |
 | Consultar reportes | Si | No | Si |
 | Consultar panel administrativo | Si | No | Si |
 
@@ -162,9 +231,19 @@ JWT_SECRET=clave-segura-de-al-menos-32-bytes
 FRONTEND_PUBLIC_URL=https://titishop.proyectoutp.com
 APP_PUBLIC_URL=https://api-titishop.proyectoutp.com
 CORS_ALLOWED_ORIGINS=https://titishop.proyectoutp.com,https://www.titishop.proyectoutp.com
+APP_UPLOAD_DIR=uploads
+APP_UPLOAD_PUBLIC_URL=https://api-titishop.proyectoutp.com/uploads
+APP_UPLOAD_MAX_FILE_SIZE=5MB
+APP_UPLOAD_MAX_REQUEST_SIZE=6MB
+FACTILIZA_API_TOKEN=token-factiliza
+FACTILIZA_API_BASE_URL=https://api.factiliza.com/v1
+FACTILIZA_CONNECT_TIMEOUT=3s
+FACTILIZA_READ_TIMEOUT=6s
+SPRINGDOC_API_DOCS_ENABLED=true
+SPRINGDOC_SWAGGER_UI_ENABLED=true
 ```
 
-Propiedades relevantes del proyecto:
+Propiedades relevantes:
 
 ```properties
 spring.application.name=titishop-backend
@@ -173,7 +252,49 @@ spring.jpa.hibernate.ddl-auto=none
 spring.flyway.enabled=true
 app.jwt.issuer=titishop-backend
 app.jwt.expiration-minutes=120
+springdoc.swagger-ui.path=/swagger-ui.html
 ```
+
+## 12. Ejecucion local
+Requisitos:
+- Java 21
+- Maven Wrapper incluido en el repositorio
+- MySQL 8+
+- Variables de entorno o archivo `.env` compatible con `application.properties`
+
+Comandos:
+
+```bash
+./mvnw clean test
+./mvnw spring-boot:run
+```
+
+Aplicacion local:
+- API: `http://localhost:8080/api`
+- Swagger: `http://localhost:8080/swagger`
+- Archivos publicos: `http://localhost:8080/uploads`
+
+## 13. Ejecucion con Docker
+```bash
+docker build -t titishop-backend .
+docker run --rm -p 8080:8080 --env-file .env titishop-backend
+```
+
+En produccion la API debe publicarse detras de Nginx/Cloudflare en:
+- Aplicacion: `https://api-titishop.proyectoutp.com`
+- Swagger UI: `https://api-titishop.proyectoutp.com/swagger`
+- Archivos publicos: `https://api-titishop.proyectoutp.com/uploads`
+
+## 14. Migraciones y datos semilla
+Flyway ejecuta las migraciones ubicadas en `src/main/resources/db/migration/`.
+
+| Migracion | Proposito |
+|---|---|
+| `V1__crear_esquema_titishop.sql` | Crea tablas principales, restricciones, indices y relaciones. |
+| `V2__sembrar_usuario_administrador.sql` | Inserta el usuario administrador inicial. |
+| `V3__actualizar_usuario_administrador_kevin.sql` | Actualiza credenciales/datos del administrador semilla. |
+| `V4__permitir_contacto_opcional_proveedores.sql` | Ajusta campos de contacto de proveedores. |
+| `V5__sembrar_catalogo_inventario_movimientos.sql` | Inserta datos base para catalogos, inventario y movimientos. |
 
 Usuario administrador semilla:
 
@@ -183,17 +304,7 @@ password: kevin123
 rol: ADMINISTRADOR
 ```
 
-## 12. Ejecucion local
-```bash
-./mvnw clean test
-./mvnw spring-boot:run
-```
-
-En produccion la API debe publicarse detras de Nginx/Cloudflare en:
-- Aplicacion: `https://api-titishop.proyectoutp.com`
-- Swagger UI: `https://api-titishop.proyectoutp.com/swagger`
-
-## 13. Modelo logico de base de datos (TitiShop)
+## 15. Modelo logico de base de datos
 ```mermaid
 erDiagram
     USUARIOS {
@@ -201,8 +312,8 @@ erDiagram
         VARCHAR nombre_completo
         VARCHAR email UK
         VARCHAR password_hash
-        ENUM rol "ADMINISTRADOR | ALMACENERO | SUPERVISOR"
-        ENUM estado "ACTIVO | INACTIVO"
+        VARCHAR rol
+        VARCHAR estado
         TIMESTAMP creado_en
         BINARY creado_por_id FK
         TIMESTAMP actualizado_en
@@ -214,7 +325,7 @@ erDiagram
     CATEGORIAS {
         BINARY id PK
         VARCHAR nombre UK
-        ENUM estado "ACTIVO | INACTIVO"
+        VARCHAR estado
         TIMESTAMP creado_en
         BINARY creado_por_id FK
         TIMESTAMP actualizado_en
@@ -226,7 +337,7 @@ erDiagram
     MARCAS {
         BINARY id PK
         VARCHAR nombre UK
-        ENUM estado "ACTIVO | INACTIVO"
+        VARCHAR estado
         TIMESTAMP creado_en
         BINARY creado_por_id FK
         TIMESTAMP actualizado_en
@@ -245,7 +356,7 @@ erDiagram
         BINARY marca_id FK
         DECIMAL precio_compra
         DECIMAL precio_venta
-        ENUM estado "ACTIVO | INACTIVO"
+        VARCHAR estado
         TIMESTAMP creado_en
         BINARY creado_por_id FK
         TIMESTAMP actualizado_en
@@ -262,7 +373,7 @@ erDiagram
         VARCHAR telefono
         VARCHAR email UK
         VARCHAR direccion
-        ENUM estado "ACTIVO | INACTIVO"
+        VARCHAR estado
         TIMESTAMP creado_en
         BINARY creado_por_id FK
         TIMESTAMP actualizado_en
@@ -277,7 +388,7 @@ erDiagram
         INT stock_actual
         INT stock_minimo
         VARCHAR ubicacion
-        ENUM estado "ACTIVO | INACTIVO"
+        VARCHAR estado
         TIMESTAMP creado_en
         BINARY creado_por_id FK
         TIMESTAMP actualizado_en
@@ -290,7 +401,7 @@ erDiagram
         BINARY id PK
         BINARY producto_id FK
         BINARY proveedor_id FK
-        ENUM tipo "ENTRADA | SALIDA | AJUSTE"
+        VARCHAR tipo
         INT cantidad
         VARCHAR motivo
         INT stock_antes
@@ -303,131 +414,57 @@ erDiagram
     }
 
     CATEGORIAS ||--o{ PRODUCTOS : "clasifica"
-    MARCAS ||--o{ PRODUCTOS : "agrupa"
+    MARCAS ||--o{ PRODUCTOS : "identifica"
     PRODUCTOS ||--|| INVENTARIO : "controla"
     PRODUCTOS ||--o{ MOVIMIENTOS : "registra"
     PROVEEDORES ||--o{ MOVIMIENTOS : "abastece"
-    USUARIOS ||--o{ USUARIOS : "audita"
-    USUARIOS ||--o{ CATEGORIAS : "audita"
-    USUARIOS ||--o{ MARCAS : "audita"
-    USUARIOS ||--o{ PRODUCTOS : "audita"
-    USUARIOS ||--o{ PROVEEDORES : "audita"
-    USUARIOS ||--o{ INVENTARIO : "audita"
-    USUARIOS ||--o{ MOVIMIENTOS : "registra/anula"
+    USUARIOS ||--o{ MOVIMIENTOS : "crea"
 ```
 
-## 14. Diagrama de arquitectura (TitiShop)
-```mermaid
-flowchart TB
-  subgraph C1["Capa Cliente"]
-    FE["Frontend Angular"]
-  end
+## 16. Integraciones externas y archivos
+### Factiliza
+El modulo `proveedores` puede consultar datos de una empresa por RUC mediante Factiliza.
 
-  subgraph C2["Capa API (Spring Boot)"]
-    API["Controladores REST<br/>/api/autenticacion, /api/usuarios, /api/productos,<br/>/api/proveedores, /api/inventario, /api/movimientos,<br/>/api/reportes, /api/panel"]
-    SEC["Seguridad<br/>JWT Bearer + Roles<br/>BCrypt + Resource Server"]
-    APP["Servicios de negocio<br/>Transacciones y validaciones"]
-  end
+Configuracion:
+- `FACTILIZA_API_TOKEN`
+- `FACTILIZA_API_BASE_URL`
+- `FACTILIZA_CONNECT_TIMEOUT`
+- `FACTILIZA_READ_TIMEOUT`
 
-  subgraph C3["Capa Persistencia"]
-    REPO["Spring Data JPA Repositories"]
-    DB[("MySQL titishop")]
-  end
+Endpoint relacionado:
+- `GET /api/proveedores/consulta-ruc/{ruc}`
 
-  subgraph M["Modulos de negocio"]
-    AUT["Autenticacion<br/>Login + Token"]
-    USU["Usuarios<br/>Roles + Estados"]
-    PRO["Productos<br/>Catalogo + Imagen + Descripcion"]
-    PRV["Proveedores<br/>Contacto + Estado"]
-    INV["Inventario<br/>Stock + Ubicacion"]
-    MOV["Movimientos<br/>Entradas + Salidas + Ajustes"]
-    RPT["Reportes<br/>Movimientos + Stock"]
-    PAN["Panel<br/>Resumen administrativo"]
-  end
+### Carga de imagenes
+El modulo `archivos` recibe imagenes de productos con `multipart/form-data`, las almacena en `APP_UPLOAD_DIR` y retorna una URL publica basada en `APP_UPLOAD_PUBLIC_URL`.
 
-  FE -->|"HTTPS JSON"| API
-  API --> SEC
-  SEC --> APP
+Endpoint relacionado:
+- `POST /api/archivos/productos`
 
-  APP --> AUT
-  APP --> USU
-  APP --> PRO
-  APP --> PRV
-  APP --> INV
-  APP --> MOV
-  APP --> RPT
-  APP --> PAN
+## 17. Pruebas automatizadas
+Ejecutar todas las pruebas:
 
-  AUT --> REPO
-  USU --> REPO
-  PRO --> REPO
-  PRV --> REPO
-  INV --> REPO
-  MOV --> REPO
-  RPT --> REPO
-  PAN --> REPO
-  REPO --> DB
+```bash
+./mvnw test
 ```
 
-## 15. Relaciones especiales
-### Producto - Categoria - Marca
-- Un producto pertenece a una categoria.
-- Un producto pertenece a una marca.
-- Categoria y marca funcionan como catalogos independientes para facilitar filtros y mantenimiento.
+Pruebas relevantes incluidas:
+- seguridad de autenticacion y roles,
+- controladores MVC,
+- servicios de archivos,
+- flujo de inventario,
+- servicio de proveedores,
+- Swagger controller.
 
-### Producto - Inventario
-- Cada producto tiene como maximo un registro de inventario.
-- Inventario concentra `stock_actual`, `stock_minimo`, `ubicacion` y `estado`.
+## 18. Gestion del proyecto
+El seguimiento de tareas, backlog y tablero del proyecto se realiza en Jira:
 
-### Movimiento - Producto - Proveedor
-- Cada movimiento pertenece a un producto.
-- El proveedor es opcional porque una salida o ajuste puede no depender de proveedor.
-- El movimiento conserva `stock_antes` y `stock_despues` para trazabilidad.
+- [Tablero Jira TitiShop](https://utp-desarrollo.atlassian.net/jira/software/projects/DV/boards/1/backlog)
 
-## 16. Requerimientos funcionales
-| ID | Requerimiento | Descripcion |
-|---|---|---|
-| RF-01 | Autenticacion de usuarios | El sistema debe permitir iniciar sesion con email y password, validando `password_hash` y emitiendo JWT. |
-| RF-02 | Gestion de usuarios | Permitir crear, consultar, actualizar e inactivar usuarios segun rol autorizado. |
-| RF-03 | Gestion de productos | Permitir administrar productos con SKU, imagen, descripcion, categoria, marca y precios. |
-| RF-04 | Gestion de categorias | Permitir administrar categorias de productos. |
-| RF-05 | Gestion de marcas | Permitir administrar marcas de productos. |
-| RF-06 | Gestion de proveedores | Permitir administrar proveedores con RUC, contactos, email y direccion. |
-| RF-07 | Gestion de inventario | Permitir consultar y actualizar stock, stock minimo y ubicacion por producto. |
-| RF-08 | Registro de movimientos | Permitir registrar entradas, salidas y ajustes de inventario. |
-| RF-09 | Control de stock negativo | Bloquear operaciones que dejen `stock_actual` por debajo de cero. |
-| RF-10 | Anulacion de movimientos | Permitir anular movimientos historicos conservando motivo, fecha y usuario responsable. |
-| RF-11 | Reportes operativos | Exponer reportes de movimientos, stock y productos criticos. |
-| RF-12 | Panel administrativo | Exponer indicadores resumidos para el dashboard del frontend. |
+## 19. Alcance del README
+Este README documenta el backend de TitiShop.
 
-## 17. Requerimientos no funcionales
-| ID | Requerimiento | Descripcion |
-|---|---|---|
-| RNF-01 | Seguridad JWT | Firmar y validar tokens con secreto configurable por entorno. |
-| RNF-02 | Control de acceso | Aplicar permisos por rol en endpoints sensibles. |
-| RNF-03 | Seguridad de passwords | Guardar passwords hasheadas, nunca en texto plano. |
-| RNF-04 | Integridad de datos | Usar PK, FK, restricciones unicas, checks y validaciones de servicio. |
-| RNF-05 | Mantenibilidad | Mantener arquitectura por funcionalidad y capas `controller`, `service`, `repository`. |
-| RNF-06 | Transacciones | Ubicar limites transaccionales en la capa de servicios. |
-| RNF-07 | Auditoria | Registrar creador, editor e inactivador en entidades modificables. |
-| RNF-08 | Migraciones | Versionar cambios de base de datos con Flyway cuando el modelo sea aprobado. |
-| RNF-09 | Documentacion API | Mantener Swagger/OpenAPI actualizado. |
-| RNF-10 | Pruebas | Agregar pruebas unitarias e integracion por cada modulo implementado. |
-
-## 18. Base de datos
-- Borrador SQL en Markdown: `src/main/resources/Base de datos/creacion-base-datos.md`.
-- El borrador no se ejecuta automaticamente.
-- Cuando el modelo sea aprobado, debe convertirse a migraciones Flyway en `src/main/resources/db/migration`.
-- Motor objetivo: MySQL 8.
-- Zona horaria recomendada para configuracion de conexion: `America/Lima`.
-
-## 19. Estado actual
-- Rama de trabajo: `dev`.
-- Estructura modular creada.
-- Entidades principales creadas.
-- Repositorios base creados.
-- Servicios y controladores base creados.
-- Seguridad JWT agregada.
-- Endpoint de login implementado.
-- Pruebas de estructura, entidades y seguridad ejecutadas correctamente.
-- Pendiente: implementar logica CRUD, reglas de inventario, reportes reales y migraciones Flyway ejecutables.
+No incluye:
+- documentacion visual del frontend Angular,
+- manual de usuario final,
+- credenciales reales de produccion,
+- secretos de servicios externos.
