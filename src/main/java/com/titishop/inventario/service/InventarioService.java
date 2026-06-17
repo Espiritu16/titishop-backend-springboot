@@ -1,7 +1,9 @@
 package com.titishop.inventario.service;
 
+import com.titishop.compartido.response.PaginaResponse;
 import com.titishop.inventario.dto.ActualizarInventarioRequest;
 import com.titishop.inventario.dto.CrearInventarioRequest;
+import com.titishop.inventario.dto.EstadoInventario;
 import com.titishop.inventario.dto.InventarioResponse;
 import com.titishop.inventario.entity.Inventario;
 import com.titishop.inventario.exception.InventarioDuplicadoPorProductoException;
@@ -14,7 +16,11 @@ import com.titishop.productos.entity.Producto;
 import com.titishop.productos.exception.ProductoNoEncontradoException;
 import com.titishop.productos.repository.ProductoRepository;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +38,23 @@ public class InventarioService {
 
 	@Transactional(readOnly = true)
 	public List<InventarioResponse> listar() {
-		return inventarioRepository.findAll().stream()
-				.map(this::toResponse)
-				.toList();
+		return listar(0, Integer.MAX_VALUE, null, null, null).content();
+	}
+
+	@Transactional(readOnly = true)
+	public PaginaResponse<InventarioResponse> listar(int page, int size, String busqueda, EstadoInventario estado, String stockEstado) {
+		var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "creadoEn"));
+		var pagina = inventarioRepository.findAll(construirFiltro(busqueda, estado, stockEstado), pageable).map(this::toResponse);
+		return new PaginaResponse<>(
+				pagina.getContent(),
+				pagina.getNumber(),
+				pagina.getSize(),
+				pagina.getTotalElements(),
+				pagina.getTotalPages(),
+				pagina.isFirst(),
+				pagina.isLast(),
+				pagina.isEmpty()
+		);
 	}
 
 	@Transactional(readOnly = true)
@@ -101,6 +121,46 @@ public class InventarioService {
 		}
 
 		return producto;
+	}
+
+	private Specification<Inventario> construirFiltro(String busqueda, EstadoInventario estado, String stockEstado) {
+		return (root, query, cb) -> {
+			var predicates = cb.conjunction();
+			String texto = busqueda == null ? "" : busqueda.trim().toLowerCase(Locale.ROOT);
+			if (!texto.isEmpty()) {
+				String like = "%" + texto + "%";
+				var producto = root.join("producto");
+				predicates = cb.and(predicates, cb.or(
+						cb.like(cb.lower(producto.get("nombre")), like),
+						cb.like(cb.lower(producto.get("sku")), like),
+						cb.like(cb.lower(root.get("ubicacion")), like)
+				));
+			}
+			if (estado != null) {
+				predicates = cb.and(
+						predicates,
+						cb.equal(root.get("estado"), com.titishop.inventario.entity.EstadoInventario.valueOf(estado.name()))
+				);
+			}
+			String stockEstadoNormalizado = stockEstado == null ? "" : stockEstado.trim().toUpperCase(Locale.ROOT);
+			if (!stockEstadoNormalizado.isEmpty()) {
+				switch (stockEstadoNormalizado) {
+					case "NORMAL" ->
+						predicates = cb.and(predicates, cb.greaterThan(root.get("stockActual"), root.get("stockMinimo")));
+					case "BAJO" ->
+						predicates = cb.and(
+								predicates,
+								cb.greaterThan(root.get("stockActual"), 0),
+								cb.lessThanOrEqualTo(root.get("stockActual"), root.get("stockMinimo"))
+						);
+					case "AGOTADO" ->
+						predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("stockActual"), 0));
+					default -> {
+					}
+				}
+			}
+			return predicates;
+		};
 	}
 
 	private InventarioResponse toResponse(Inventario inventario) {
