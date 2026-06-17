@@ -2,9 +2,11 @@ package com.titishop.productos.controller;
 
 import com.titishop.productos.dto.ActualizarMarcaRequest;
 import com.titishop.productos.dto.CrearMarcaRequest;
+import com.titishop.productos.dto.EstadoCatalogo;
 import com.titishop.productos.dto.MarcaResponse;
 import com.titishop.productos.service.MarcaService;
 import com.titishop.compartido.response.ErrorResponse;
+import com.titishop.compartido.response.PaginaResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -16,7 +18,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,8 +53,13 @@ public class MarcaController {
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 	})
-	public List<MarcaResponse> listar() {
-		return marcaService.listar();
+	public PaginaResponse<MarcaResponse> listar(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size,
+			@RequestParam(required = false) String busqueda,
+			@RequestParam(required = false) EstadoCatalogo estado
+	) {
+		return marcaService.listar(page, size, busqueda, estado);
 	}
 
 	@GetMapping("/{id}")

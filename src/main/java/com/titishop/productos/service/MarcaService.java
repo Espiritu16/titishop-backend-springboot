@@ -1,14 +1,20 @@
 package com.titishop.productos.service;
 
+import com.titishop.compartido.response.PaginaResponse;
 import com.titishop.productos.dto.ActualizarMarcaRequest;
 import com.titishop.productos.dto.CrearMarcaRequest;
+import com.titishop.productos.dto.EstadoCatalogo;
 import com.titishop.productos.dto.MarcaResponse;
 import com.titishop.productos.entity.Marca;
 import com.titishop.productos.exception.MarcaNoEncontradaException;
 import com.titishop.productos.exception.NombreMarcaDuplicadoException;
 import com.titishop.productos.repository.MarcaRepository;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +30,23 @@ public class MarcaService {
 
 	@Transactional(readOnly = true)
 	public List<MarcaResponse> listar() {
-		return marcaRepository.findAll().stream()
-				.map(this::toResponse)
-				.toList();
+		return listar(0, Integer.MAX_VALUE, null, null).content();
+	}
+
+	@Transactional(readOnly = true)
+	public PaginaResponse<MarcaResponse> listar(int page, int size, String busqueda, EstadoCatalogo estado) {
+		var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "creadoEn"));
+		var pagina = marcaRepository.findAll(construirFiltro(busqueda, estado), pageable).map(this::toResponse);
+		return new PaginaResponse<>(
+				pagina.getContent(),
+				pagina.getNumber(),
+				pagina.getSize(),
+				pagina.getTotalElements(),
+				pagina.getTotalPages(),
+				pagina.isFirst(),
+				pagina.isLast(),
+				pagina.isEmpty()
+		);
 	}
 
 	@Transactional(readOnly = true)
@@ -67,6 +87,23 @@ public class MarcaService {
 
 	private String normalizarNombre(String nombre) {
 		return nombre.trim();
+	}
+
+	private Specification<Marca> construirFiltro(String busqueda, EstadoCatalogo estado) {
+		return (root, query, cb) -> {
+			var predicates = cb.conjunction();
+			String texto = busqueda == null ? "" : busqueda.trim().toLowerCase(Locale.ROOT);
+			if (!texto.isEmpty()) {
+				predicates = cb.and(predicates, cb.like(cb.lower(root.get("nombre")), "%" + texto + "%"));
+			}
+			if (estado != null) {
+				predicates = cb.and(
+						predicates,
+						cb.equal(root.get("estado"), com.titishop.productos.entity.EstadoCatalogo.valueOf(estado.name()))
+				);
+			}
+			return predicates;
+		};
 	}
 
 	private MarcaResponse toResponse(Marca marca) {

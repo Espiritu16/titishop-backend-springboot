@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.titishop.compartido.exception.ManejadorGlobalException;
+import com.titishop.compartido.response.PaginaResponse;
 import com.titishop.movimientos.controller.MovimientoController;
 import com.titishop.movimientos.dto.AnularMovimientoRequest;
 import com.titishop.movimientos.dto.MovimientoResponse;
@@ -84,11 +85,20 @@ class MovimientoControllerTests {
 	void listarRetornaMovimientos() throws Exception {
 		UUID productoId = UUID.randomUUID();
 		UUID usuarioId = UUID.randomUUID();
-		when(movimientoService.listar()).thenReturn(List.of(movimientoResponse(productoId, null, usuarioId, TipoMovimiento.SALIDA)));
+		when(movimientoService.listar(0, 10, null, null, null)).thenReturn(new PaginaResponse<>(
+				List.of(movimientoResponse(productoId, null, usuarioId, TipoMovimiento.SALIDA)),
+				0,
+				10,
+				1,
+				1,
+				true,
+				true,
+				false
+		));
 
 		mockMvc.perform(get("/api/movimientos"))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].tipo").value("SALIDA"));
+				.andExpect(jsonPath("$.content[0].tipo").value("SALIDA"));
 	}
 
 	@Test

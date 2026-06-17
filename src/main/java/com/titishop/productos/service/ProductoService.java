@@ -1,7 +1,9 @@
 package com.titishop.productos.service;
 
+import com.titishop.compartido.response.PaginaResponse;
 import com.titishop.productos.dto.ActualizarProductoRequest;
 import com.titishop.productos.dto.CrearProductoRequest;
+import com.titishop.productos.dto.EstadoProducto;
 import com.titishop.productos.dto.ProductoResponse;
 import com.titishop.productos.entity.Categoria;
 import com.titishop.productos.entity.EstadoCatalogo;
@@ -21,6 +23,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,9 +49,31 @@ public class ProductoService {
 
 	@Transactional(readOnly = true)
 	public List<ProductoResponse> listar() {
-		return productoRepository.findAll().stream()
-				.map(this::toResponse)
-				.toList();
+		return listar(0, Integer.MAX_VALUE, null, null, null, null).content();
+	}
+
+	@Transactional(readOnly = true)
+	public PaginaResponse<ProductoResponse> listar(
+			int page,
+			int size,
+			String busqueda,
+			EstadoProducto estado,
+			UUID categoriaId,
+			UUID marcaId
+	) {
+		var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "creadoEn"));
+		var pagina = productoRepository.findAll(construirFiltro(busqueda, estado, categoriaId, marcaId), pageable)
+				.map(this::toResponse);
+		return new PaginaResponse<>(
+				pagina.getContent(),
+				pagina.getNumber(),
+				pagina.getSize(),
+				pagina.getTotalElements(),
+				pagina.getTotalPages(),
+				pagina.isFirst(),
+				pagina.isLast(),
+				pagina.isEmpty()
+		);
 	}
 
 	@Transactional(readOnly = true)
@@ -150,6 +177,46 @@ public class ProductoService {
 		}
 		String value = imagenUrl.trim();
 		return value.isEmpty() ? null : value;
+	}
+
+	private Specification<Producto> construirFiltro(
+			String busqueda,
+			EstadoProducto estado,
+			UUID categoriaId,
+			UUID marcaId
+	) {
+		return (root, query, cb) -> {
+			var predicates = cb.conjunction();
+			String texto = normalizarTextoLibre(busqueda);
+			if (!texto.isEmpty()) {
+				String like = "%" + texto + "%";
+				var categoria = root.join("categoria");
+				var marca = root.join("marca");
+				predicates = cb.and(predicates, cb.or(
+						cb.like(cb.lower(root.get("nombre")), like),
+						cb.like(cb.lower(root.get("sku")), like),
+						cb.like(cb.lower(categoria.get("nombre")), like),
+						cb.like(cb.lower(marca.get("nombre")), like)
+				));
+			}
+			if (estado != null) {
+				predicates = cb.and(
+						predicates,
+						cb.equal(root.get("estado"), com.titishop.productos.entity.EstadoProducto.valueOf(estado.name()))
+				);
+			}
+			if (categoriaId != null) {
+				predicates = cb.and(predicates, cb.equal(root.get("categoria").get("id"), categoriaId));
+			}
+			if (marcaId != null) {
+				predicates = cb.and(predicates, cb.equal(root.get("marca").get("id"), marcaId));
+			}
+			return predicates;
+		};
+	}
+
+	private String normalizarTextoLibre(String value) {
+		return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
 	}
 
 	private ProductoResponse toResponse(Producto producto) {

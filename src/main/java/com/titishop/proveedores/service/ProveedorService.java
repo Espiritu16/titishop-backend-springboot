@@ -1,8 +1,10 @@
 package com.titishop.proveedores.service;
 
+import com.titishop.compartido.response.PaginaResponse;
 import com.titishop.proveedores.dto.ActualizarProveedorRequest;
 import com.titishop.proveedores.dto.ConsultaRucProveedorResponse;
 import com.titishop.proveedores.dto.CrearProveedorRequest;
+import com.titishop.proveedores.dto.EstadoProveedor;
 import com.titishop.proveedores.dto.ProveedorResponse;
 import com.titishop.proveedores.entity.Proveedor;
 import com.titishop.proveedores.exception.EmailProveedorDuplicadoException;
@@ -12,6 +14,9 @@ import com.titishop.proveedores.repository.ProveedorRepository;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,9 +35,23 @@ public class ProveedorService {
 
 	@Transactional(readOnly = true)
 	public List<ProveedorResponse> listar() {
-		return proveedorRepository.findAll().stream()
-				.map(this::toResponse)
-				.toList();
+		return listar(0, Integer.MAX_VALUE, null, null).content();
+	}
+
+	@Transactional(readOnly = true)
+	public PaginaResponse<ProveedorResponse> listar(int page, int size, String busqueda, EstadoProveedor estado) {
+		var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "creadoEn"));
+		var pagina = proveedorRepository.findAll(construirFiltro(busqueda, estado), pageable).map(this::toResponse);
+		return new PaginaResponse<>(
+				pagina.getContent(),
+				pagina.getNumber(),
+				pagina.getSize(),
+				pagina.getTotalElements(),
+				pagina.getTotalPages(),
+				pagina.isFirst(),
+				pagina.isLast(),
+				pagina.isEmpty()
+		);
 	}
 
 	@Transactional(readOnly = true)
@@ -132,6 +151,29 @@ public class ProveedorService {
 			return null;
 		}
 		return email.trim().toLowerCase(Locale.ROOT);
+	}
+
+	private Specification<Proveedor> construirFiltro(String busqueda, EstadoProveedor estado) {
+		return (root, query, cb) -> {
+			var predicates = cb.conjunction();
+			String texto = busqueda == null ? "" : busqueda.trim().toLowerCase(Locale.ROOT);
+			if (!texto.isEmpty()) {
+				String like = "%" + texto + "%";
+				predicates = cb.and(predicates, cb.or(
+						cb.like(cb.lower(root.get("razonSocial")), like),
+						cb.like(cb.lower(root.get("ruc")), like),
+						cb.like(cb.lower(root.get("email")), like),
+						cb.like(cb.lower(root.get("direccion")), like)
+				));
+			}
+			if (estado != null) {
+				predicates = cb.and(
+						predicates,
+						cb.equal(root.get("estado"), com.titishop.proveedores.entity.EstadoProveedor.valueOf(estado.name()))
+				);
+			}
+			return predicates;
+		};
 	}
 
 	private ProveedorResponse toResponse(Proveedor proveedor) {

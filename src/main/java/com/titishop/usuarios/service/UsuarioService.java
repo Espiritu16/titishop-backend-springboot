@@ -1,5 +1,6 @@
 package com.titishop.usuarios.service;
 
+import com.titishop.compartido.response.PaginaResponse;
 import com.titishop.usuarios.dto.ActualizarUsuarioRequest;
 import com.titishop.usuarios.dto.CrearUsuarioRequest;
 import com.titishop.usuarios.dto.UsuarioResponse;
@@ -10,9 +11,12 @@ import com.titishop.usuarios.repository.UsuarioRepository;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 @Transactional
@@ -28,9 +32,29 @@ public class UsuarioService {
 
 	@Transactional(readOnly = true)
 	public List<UsuarioResponse> listar() {
-		return usuarioRepository.findAll().stream()
-				.map(this::toResponse)
-				.toList();
+		return listar(0, Integer.MAX_VALUE, null, null, null).content();
+	}
+
+	@Transactional(readOnly = true)
+	public PaginaResponse<UsuarioResponse> listar(
+			int page,
+			int size,
+			String busqueda,
+			com.titishop.usuarios.entity.RolUsuario rol,
+			com.titishop.usuarios.entity.EstadoUsuario estado
+	) {
+		var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "creadoEn"));
+		var pagina = usuarioRepository.findAll(construirFiltro(busqueda, rol, estado), pageable).map(this::toResponse);
+		return new PaginaResponse<>(
+				pagina.getContent(),
+				pagina.getNumber(),
+				pagina.getSize(),
+				pagina.getTotalElements(),
+				pagina.getTotalPages(),
+				pagina.isFirst(),
+				pagina.isLast(),
+				pagina.isEmpty()
+		);
 	}
 
 	@Transactional(readOnly = true)
@@ -93,6 +117,32 @@ public class UsuarioService {
 
 	private String normalizarEmail(String email) {
 		return email.trim().toLowerCase(Locale.ROOT);
+	}
+
+	private Specification<Usuario> construirFiltro(
+			String busqueda,
+			com.titishop.usuarios.entity.RolUsuario rol,
+			com.titishop.usuarios.entity.EstadoUsuario estado
+	) {
+		return (root, query, cb) -> {
+			var predicates = cb.conjunction();
+			String texto = busqueda == null ? "" : busqueda.trim().toLowerCase(Locale.ROOT);
+			if (!texto.isEmpty()) {
+				String like = "%" + texto + "%";
+				predicates = cb.and(predicates, cb.or(
+						cb.like(cb.lower(root.get("nombreCompleto")), like),
+						cb.like(cb.lower(root.get("email")), like),
+						cb.like(cb.lower(root.get("rol").as(String.class)), like)
+				));
+			}
+			if (rol != null) {
+				predicates = cb.and(predicates, cb.equal(root.get("rol"), rol));
+			}
+			if (estado != null) {
+				predicates = cb.and(predicates, cb.equal(root.get("estado"), estado));
+			}
+			return predicates;
+		};
 	}
 
 	private UsuarioResponse toResponse(Usuario usuario) {

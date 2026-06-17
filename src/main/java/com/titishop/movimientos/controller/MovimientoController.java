@@ -3,8 +3,10 @@ package com.titishop.movimientos.controller;
 import com.titishop.movimientos.dto.AnularMovimientoRequest;
 import com.titishop.movimientos.dto.MovimientoResponse;
 import com.titishop.movimientos.dto.RegistrarMovimientoRequest;
+import com.titishop.movimientos.dto.TipoMovimiento;
 import com.titishop.movimientos.service.MovimientoService;
 import com.titishop.compartido.response.ErrorResponse;
+import com.titishop.compartido.response.PaginaResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -16,7 +18,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,8 +53,14 @@ public class MovimientoController {
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 	})
-	public List<MovimientoResponse> listar() {
-		return movimientoService.listar();
+	public PaginaResponse<MovimientoResponse> listar(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size,
+			@RequestParam(required = false) String busqueda,
+			@RequestParam(required = false) TipoMovimiento tipo,
+			@RequestParam(required = false) Boolean anulado
+	) {
+		return movimientoService.listar(page, size, busqueda, tipo, anulado);
 	}
 
 	@GetMapping("/{id}")
