@@ -3,12 +3,13 @@ package com.titishop.proveedores.controller;
 import com.titishop.proveedores.dto.ActualizarProveedorRequest;
 import com.titishop.proveedores.dto.ConsultaRucProveedorResponse;
 import com.titishop.proveedores.dto.CrearProveedorRequest;
+import com.titishop.proveedores.dto.EstadoProveedor;
 import com.titishop.proveedores.dto.ProveedorResponse;
 import com.titishop.proveedores.service.ProveedorService;
 import com.titishop.compartido.response.ErrorResponse;
+import com.titishop.compartido.response.PaginaResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,8 +18,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,14 +52,19 @@ public class ProveedorController {
 	@Operation(summary = "Listar proveedores", description = "Obtiene todos los proveedores registrados.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Listado obtenido correctamente.",
-					content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProveedorResponse.class)))),
+					content = @Content(schema = @Schema(implementation = PaginaResponse.class))),
 			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 	})
-	public List<ProveedorResponse> listar() {
-		return proveedorService.listar();
+	public PaginaResponse<ProveedorResponse> listar(
+			@RequestParam(defaultValue = "0") @Min(0) int page,
+			@RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
+			@RequestParam(required = false) String busqueda,
+			@RequestParam(required = false) EstadoProveedor estado
+	) {
+		return proveedorService.listar(page, size, busqueda, estado);
 	}
 
 	@GetMapping("/{id}")

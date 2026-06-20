@@ -3,11 +3,12 @@ package com.titishop.productos.controller;
 import com.titishop.productos.dto.ActualizarCategoriaRequest;
 import com.titishop.productos.dto.CategoriaResponse;
 import com.titishop.productos.dto.CrearCategoriaRequest;
+import com.titishop.productos.dto.EstadoCatalogo;
 import com.titishop.productos.service.CategoriaService;
 import com.titishop.compartido.response.ErrorResponse;
+import com.titishop.compartido.response.PaginaResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,9 +17,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,10 +29,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Validated
 @RequestMapping("/api/categorias")
 @Tag(name = "Categorias", description = "Gestion de categorias del catalogo de productos.")
 @SecurityRequirement(name = "bearerAuth")
@@ -45,14 +50,19 @@ public class CategoriaController {
 	@Operation(summary = "Listar categorias", description = "Obtiene todas las categorias registradas.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Listado obtenido correctamente.",
-					content = @Content(array = @ArraySchema(schema = @Schema(implementation = CategoriaResponse.class)))),
+					content = @Content(schema = @Schema(implementation = PaginaResponse.class))),
 			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 	})
-	public List<CategoriaResponse> listar() {
-		return categoriaService.listar();
+	public PaginaResponse<CategoriaResponse> listar(
+			@RequestParam(defaultValue = "0") @Min(0) int page,
+			@RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
+			@RequestParam(required = false) String busqueda,
+			@RequestParam(required = false) EstadoCatalogo estado
+	) {
+		return categoriaService.listar(page, size, busqueda, estado);
 	}
 
 	@GetMapping("/{id}")

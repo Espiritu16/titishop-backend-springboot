@@ -2,6 +2,7 @@ package com.titishop.inventario;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -9,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.titishop.compartido.exception.ManejadorGlobalException;
+import com.titishop.compartido.response.PaginaResponse;
 import com.titishop.inventario.controller.InventarioController;
 import com.titishop.inventario.dto.CrearInventarioRequest;
 import com.titishop.inventario.dto.EstadoInventario;
@@ -98,5 +100,14 @@ class InventarioControllerTests {
 						.contentType("application/json")
 						.content(body))
 				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void listarAceptaFiltroStockEstado() throws Exception {
+		when(inventarioService.listar(0, 10, null, null, "AGOTADO"))
+				.thenReturn(new PaginaResponse<>(java.util.List.of(), 0, 10, 0, 0, true, true, true));
+
+		mockMvc.perform(get("/api/inventario").param("stockEstado", "AGOTADO"))
+				.andExpect(status().isOk());
 	}
 }

@@ -1,13 +1,19 @@
 package com.titishop.productos.service;
 
+import com.titishop.compartido.response.PaginaResponse;
 import com.titishop.productos.dto.ActualizarCategoriaRequest;
 import com.titishop.productos.dto.CategoriaResponse;
 import com.titishop.productos.dto.CrearCategoriaRequest;
+import com.titishop.productos.dto.EstadoCatalogo;
 import com.titishop.productos.exception.CategoriaNoEncontradaException;
 import com.titishop.productos.exception.NombreCategoriaDuplicadoException;
 import com.titishop.productos.repository.CategoriaRepository;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,9 +29,23 @@ public class CategoriaService {
 
 	@Transactional(readOnly = true)
 	public List<CategoriaResponse> listar() {
-		return categoriaRepository.findAll().stream()
-				.map(this::toResponse)
-				.toList();
+		return listar(0, Integer.MAX_VALUE, null, null).content();
+	}
+
+	@Transactional(readOnly = true)
+	public PaginaResponse<CategoriaResponse> listar(int page, int size, String busqueda, EstadoCatalogo estado) {
+		var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "creadoEn"));
+		var pagina = categoriaRepository.findAll(construirFiltro(busqueda, estado), pageable).map(this::toResponse);
+		return new PaginaResponse<>(
+				pagina.getContent(),
+				pagina.getNumber(),
+				pagina.getSize(),
+				pagina.getTotalElements(),
+				pagina.getTotalPages(),
+				pagina.isFirst(),
+				pagina.isLast(),
+				pagina.isEmpty()
+		);
 	}
 
 	@Transactional(readOnly = true)
@@ -66,6 +86,23 @@ public class CategoriaService {
 
 	private String normalizarNombre(String nombre) {
 		return nombre.trim();
+	}
+
+	private Specification<com.titishop.productos.entity.Categoria> construirFiltro(String busqueda, EstadoCatalogo estado) {
+		return (root, query, cb) -> {
+			var predicates = cb.conjunction();
+			String texto = busqueda == null ? "" : busqueda.trim().toLowerCase(Locale.ROOT);
+			if (!texto.isEmpty()) {
+				predicates = cb.and(predicates, cb.like(cb.lower(root.get("nombre")), "%" + texto + "%"));
+			}
+			if (estado != null) {
+				predicates = cb.and(
+						predicates,
+						cb.equal(root.get("estado"), com.titishop.productos.entity.EstadoCatalogo.valueOf(estado.name()))
+				);
+			}
+			return predicates;
+		};
 	}
 
 	private CategoriaResponse toResponse(com.titishop.productos.entity.Categoria categoria) {

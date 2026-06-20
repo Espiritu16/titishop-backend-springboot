@@ -1,5 +1,6 @@
 package com.titishop.movimientos.service;
 
+import com.titishop.compartido.response.PaginaResponse;
 import com.titishop.inventario.entity.EstadoInventario;
 import com.titishop.inventario.entity.Inventario;
 import com.titishop.inventario.exception.InventarioNoEncontradoException;
@@ -26,7 +27,11 @@ import com.titishop.usuarios.entity.Usuario;
 import com.titishop.usuarios.exception.UsuarioNoEncontradoException;
 import com.titishop.usuarios.repository.UsuarioRepository;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,9 +61,29 @@ public class MovimientoService {
 
 	@Transactional(readOnly = true)
 	public List<MovimientoResponse> listar() {
-		return movimientoRepository.findAll().stream()
-				.map(this::toResponse)
-				.toList();
+		return listar(0, Integer.MAX_VALUE, null, null, null).content();
+	}
+
+	@Transactional(readOnly = true)
+	public PaginaResponse<MovimientoResponse> listar(
+			int page,
+			int size,
+			String busqueda,
+			com.titishop.movimientos.dto.TipoMovimiento tipo,
+			Boolean anulado
+	) {
+		var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "creadoEn"));
+		var pagina = movimientoRepository.findAll(construirFiltro(busqueda, tipo, anulado), pageable).map(this::toResponse);
+		return new PaginaResponse<>(
+				pagina.getContent(),
+				pagina.getNumber(),
+				pagina.getSize(),
+				pagina.getTotalElements(),
+				pagina.getTotalPages(),
+				pagina.isFirst(),
+				pagina.isLast(),
+				pagina.isEmpty()
+		);
 	}
 
 	@Transactional(readOnly = true)
@@ -201,6 +226,40 @@ public class MovimientoService {
 			}
 			case SALIDA -> stockActual + movimiento.getCantidad();
 			case AJUSTE -> movimiento.getStockAntes();
+		};
+	}
+
+	private Specification<Movimiento> construirFiltro(
+			String busqueda,
+			com.titishop.movimientos.dto.TipoMovimiento tipo,
+			Boolean anulado
+	) {
+		return (root, query, cb) -> {
+			var predicates = cb.conjunction();
+			String texto = busqueda == null ? "" : busqueda.trim().toLowerCase(Locale.ROOT);
+			if (!texto.isEmpty()) {
+				String like = "%" + texto + "%";
+				var producto = root.join("producto");
+				var proveedor = root.join("proveedor", jakarta.persistence.criteria.JoinType.LEFT);
+				predicates = cb.and(predicates, cb.or(
+						cb.like(cb.lower(producto.get("nombre")), like),
+						cb.like(cb.lower(producto.get("sku")), like),
+						cb.like(cb.lower(root.get("motivo")), like),
+						cb.like(cb.lower(proveedor.get("razonSocial")), like)
+				));
+			}
+			if (tipo != null) {
+				predicates = cb.and(
+						predicates,
+						cb.equal(root.get("tipo"), com.titishop.movimientos.entity.TipoMovimiento.valueOf(tipo.name()))
+				);
+			}
+			if (anulado != null) {
+				predicates = anulado
+						? cb.and(predicates, cb.isNotNull(root.get("anuladoEn")))
+						: cb.and(predicates, cb.isNull(root.get("anuladoEn")));
+			}
+			return predicates;
 		};
 	}
 

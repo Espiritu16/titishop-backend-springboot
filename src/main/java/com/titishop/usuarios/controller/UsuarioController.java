@@ -3,11 +3,13 @@ package com.titishop.usuarios.controller;
 import com.titishop.usuarios.dto.ActualizarUsuarioRequest;
 import com.titishop.usuarios.dto.CrearUsuarioRequest;
 import com.titishop.usuarios.dto.UsuarioResponse;
+import com.titishop.usuarios.entity.EstadoUsuario;
+import com.titishop.usuarios.entity.RolUsuario;
 import com.titishop.usuarios.service.UsuarioService;
 import com.titishop.compartido.response.ErrorResponse;
+import com.titishop.compartido.response.PaginaResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,9 +18,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,10 +30,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Validated
 @RequestMapping("/api/usuarios")
 @Tag(name = "Usuarios", description = "Administracion de usuarios internos de TitiShop.")
 @SecurityRequirement(name = "bearerAuth")
@@ -45,14 +51,20 @@ public class UsuarioController {
 	@Operation(summary = "Listar usuarios", description = "Obtiene todos los usuarios registrados en el sistema.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Listado obtenido correctamente.",
-					content = @Content(array = @ArraySchema(schema = @Schema(implementation = UsuarioResponse.class)))),
+					content = @Content(schema = @Schema(implementation = PaginaResponse.class))),
 			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 	})
-	public List<UsuarioResponse> listar() {
-		return usuarioService.listar();
+	public PaginaResponse<UsuarioResponse> listar(
+			@RequestParam(defaultValue = "0") @Min(0) int page,
+			@RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
+			@RequestParam(required = false) String busqueda,
+			@RequestParam(required = false) RolUsuario rol,
+			@RequestParam(required = false) EstadoUsuario estado
+	) {
+		return usuarioService.listar(page, size, busqueda, rol, estado);
 	}
 
 	@GetMapping("/{id}")
