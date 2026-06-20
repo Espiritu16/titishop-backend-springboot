@@ -32,12 +32,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class ManejadorGlobalException {
@@ -124,7 +127,28 @@ public class ManejadorGlobalException {
 		List<String> details = ex.getConstraintViolations().stream()
 				.map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
 				.toList();
-		return build(HttpStatus.BAD_REQUEST, "Error de validacion.", request, details);
+		return build(HttpStatus.BAD_REQUEST, "Parametro de solicitud invalido.", request, details);
+	}
+
+	@ExceptionHandler(AuthenticationException.class)
+	ResponseEntity<ErrorResponse> manejarErrorAutenticacion(AuthenticationException ex, HttpServletRequest request) {
+		return build(HttpStatus.UNAUTHORIZED, "Usuario o contrasena incorrectos.", request, List.of());
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	ResponseEntity<ErrorResponse> manejarParametroTipoInvalido(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+		String detail = ex.getName() + ": valor invalido.";
+		return build(HttpStatus.BAD_REQUEST, "Parametro de solicitud invalido.", request, List.of(detail));
+	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	ResponseEntity<ErrorResponse> manejarArgumentoInvalido(IllegalArgumentException ex, HttpServletRequest request) {
+		return build(HttpStatus.BAD_REQUEST, "Parametro de solicitud invalido.", request, List.of());
+	}
+
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	ResponseEntity<ErrorResponse> manejarCuerpoNoLegible(HttpMessageNotReadableException ex, HttpServletRequest request) {
+		return build(HttpStatus.BAD_REQUEST, "Cuerpo de solicitud invalido.", request, List.of());
 	}
 
 	@ExceptionHandler(Exception.class)

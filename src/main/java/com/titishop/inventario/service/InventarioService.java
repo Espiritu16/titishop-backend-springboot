@@ -44,7 +44,8 @@ public class InventarioService {
 	@Transactional(readOnly = true)
 	public PaginaResponse<InventarioResponse> listar(int page, int size, String busqueda, EstadoInventario estado, String stockEstado) {
 		var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "creadoEn"));
-		var pagina = inventarioRepository.findAll(construirFiltro(busqueda, estado, stockEstado), pageable).map(this::toResponse);
+		var pagina = inventarioRepository.findAll(construirFiltro(busqueda, estado, normalizarStockEstado(stockEstado)), pageable)
+				.map(this::toResponse);
 		return new PaginaResponse<>(
 				pagina.getContent(),
 				pagina.getNumber(),
@@ -123,7 +124,7 @@ public class InventarioService {
 		return producto;
 	}
 
-	private Specification<Inventario> construirFiltro(String busqueda, EstadoInventario estado, String stockEstado) {
+	private Specification<Inventario> construirFiltro(String busqueda, EstadoInventario estado, String stockEstadoNormalizado) {
 		return (root, query, cb) -> {
 			var predicates = cb.conjunction();
 			String texto = busqueda == null ? "" : busqueda.trim().toLowerCase(Locale.ROOT);
@@ -142,7 +143,6 @@ public class InventarioService {
 						cb.equal(root.get("estado"), com.titishop.inventario.entity.EstadoInventario.valueOf(estado.name()))
 				);
 			}
-			String stockEstadoNormalizado = stockEstado == null ? "" : stockEstado.trim().toUpperCase(Locale.ROOT);
 			if (!stockEstadoNormalizado.isEmpty()) {
 				switch (stockEstadoNormalizado) {
 					case "NORMAL" ->
@@ -156,11 +156,23 @@ public class InventarioService {
 					case "AGOTADO" ->
 						predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("stockActual"), 0));
 					default -> {
+						throw new IllegalArgumentException("stockEstado debe ser NORMAL, BAJO o AGOTADO.");
 					}
 				}
 			}
 			return predicates;
 		};
+	}
+
+	private String normalizarStockEstado(String stockEstado) {
+		String stockEstadoNormalizado = stockEstado == null ? "" : stockEstado.trim().toUpperCase(Locale.ROOT);
+		if (!stockEstadoNormalizado.isEmpty()
+				&& !stockEstadoNormalizado.equals("NORMAL")
+				&& !stockEstadoNormalizado.equals("BAJO")
+				&& !stockEstadoNormalizado.equals("AGOTADO")) {
+			throw new IllegalArgumentException("stockEstado debe ser NORMAL, BAJO o AGOTADO.");
+		}
+		return stockEstadoNormalizado;
 	}
 
 	private InventarioResponse toResponse(Inventario inventario) {
