@@ -2,6 +2,7 @@ package com.titishop.productos;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -124,6 +125,43 @@ class ProductoCategoriaControllerTests {
 		mockMvc.perform(put("/api/productos/{id}", UUID.randomUUID())
 						.contentType("application/json")
 						.content(body))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void actualizarEstadoProductoConPatchRetorna200() throws Exception {
+		UUID id = UUID.randomUUID();
+		ProductoResponse response = new ProductoResponse(
+				id,
+				"Mouse",
+				"SKU-1",
+				"Optico",
+				null,
+				UUID.randomUUID(),
+				"Perifericos",
+				UUID.randomUUID(),
+				"Logi",
+				BigDecimal.ONE,
+				BigDecimal.TEN,
+				EstadoProducto.INACTIVO,
+				Instant.now(),
+				null
+		);
+		when(productoService.actualizarEstado(any(UUID.class), any())).thenReturn(response);
+
+		mockMvc.perform(patch("/api/productos/{id}/estado", id)
+						.contentType("application/json")
+						.content("""
+								{ "estado": "INACTIVO" }
+								"""))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void actualizarEstadoProductoSinEstadoRetorna400() throws Exception {
+		mockMvc.perform(patch("/api/productos/{id}/estado", UUID.randomUUID())
+						.contentType("application/json")
+						.content("{}"))
 				.andExpect(status().isBadRequest());
 	}
 }

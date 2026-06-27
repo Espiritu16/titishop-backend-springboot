@@ -5,6 +5,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -118,6 +119,30 @@ class ProveedorControllerTests {
 
 		mockMvc.perform(delete("/api/proveedores/{id}", UUID.randomUUID()))
 				.andExpect(status().isNoContent());
+	}
+
+	@Test
+	void actualizarEstadoConPatchRetorna200() throws Exception {
+		UUID id = UUID.randomUUID();
+		ProveedorResponse response = new ProveedorResponse(
+				id,
+				"Proveedor Uno",
+				"20609998881",
+				"987654321",
+				"014700000",
+				"ventas@uno.pe",
+				"Av. Uno 123",
+				EstadoProveedor.INACTIVO,
+				Instant.now(),
+				null
+		);
+		when(proveedorService.actualizarEstado(any(UUID.class), any())).thenReturn(response);
+
+		mockMvc.perform(patch("/api/proveedores/{id}/estado", id)
+						.contentType("application/json")
+						.content("{\"estado\":\"INACTIVO\"}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.estado").value("INACTIVO"));
 	}
 
 	private CrearProveedorRequest crearRequest() {

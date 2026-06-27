@@ -1,6 +1,7 @@
 package com.titishop.productos.controller;
 
 import com.titishop.productos.dto.ActualizarProductoRequest;
+import com.titishop.productos.dto.ActualizarEstadoProductoRequest;
 import com.titishop.productos.dto.CrearProductoRequest;
 import com.titishop.productos.dto.EstadoProducto;
 import com.titishop.productos.dto.ProductoResponse;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -175,6 +177,28 @@ public class ProductoController {
 			@Valid @RequestBody ActualizarProductoRequest request
 	) {
 		return productoService.actualizar(id, request);
+	}
+
+	@PatchMapping("/{id}/estado")
+	@Operation(summary = "Cambiar estado de producto", description = "Actualiza solo el estado comercial de un producto.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Estado actualizado correctamente.",
+					content = @Content(schema = @Schema(implementation = ProductoResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
+			@ApiResponse(responseCode = "404", description = "Producto no encontrado.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "422", description = "Categoria o marca inactiva para activar el producto.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	public ProductoResponse actualizarEstado(
+			@Parameter(description = "ID del producto.", example = "4f55a1cc-a3f8-4be1-83ab-9b9f4c9c1001")
+			@PathVariable UUID id,
+			@Valid @RequestBody ActualizarEstadoProductoRequest request
+	) {
+		return productoService.actualizarEstado(id, request);
 	}
 
 	@DeleteMapping("/{id}")

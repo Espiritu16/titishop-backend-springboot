@@ -3,6 +3,7 @@ package com.titishop.inventario;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -108,6 +109,30 @@ class InventarioControllerTests {
 				.thenReturn(new PaginaResponse<>(java.util.List.of(), 0, 10, 0, 0, true, true, true));
 
 		mockMvc.perform(get("/api/inventario").param("stockEstado", "AGOTADO"))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void actualizarEstadoConPatchRetorna200() throws Exception {
+		UUID id = UUID.randomUUID();
+		InventarioResponse response = new InventarioResponse(
+				id,
+				UUID.randomUUID(),
+				"Mouse",
+				"SKU-1",
+				0,
+				5,
+				"A-01",
+				EstadoInventario.INACTIVO,
+				false,
+				Instant.now(),
+				null
+		);
+		when(inventarioService.actualizarEstado(any(UUID.class), any())).thenReturn(response);
+
+		mockMvc.perform(patch("/api/inventario/{id}/estado", id)
+						.contentType("application/json")
+						.content("{\"estado\":\"INACTIVO\"}"))
 				.andExpect(status().isOk());
 	}
 }

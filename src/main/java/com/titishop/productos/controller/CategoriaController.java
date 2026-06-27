@@ -1,6 +1,7 @@
 package com.titishop.productos.controller;
 
 import com.titishop.productos.dto.ActualizarCategoriaRequest;
+import com.titishop.productos.dto.ActualizarEstadoCatalogoRequest;
 import com.titishop.productos.dto.CategoriaResponse;
 import com.titishop.productos.dto.CrearCategoriaRequest;
 import com.titishop.productos.dto.EstadoCatalogo;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -153,6 +155,26 @@ public class CategoriaController {
 			@Valid @RequestBody ActualizarCategoriaRequest request
 	) {
 		return categoriaService.actualizar(id, request);
+	}
+
+	@PatchMapping("/{id}/estado")
+	@Operation(summary = "Cambiar estado de categoria", description = "Actualiza solo el estado de una categoria.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Estado actualizado correctamente.",
+					content = @Content(schema = @Schema(implementation = CategoriaResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
+			@ApiResponse(responseCode = "404", description = "Categoria no encontrada.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	public CategoriaResponse actualizarEstado(
+			@Parameter(description = "ID de la categoria.", example = "0f1e2d3c-4b5a-6789-9012-3456789abcde")
+			@PathVariable UUID id,
+			@Valid @RequestBody ActualizarEstadoCatalogoRequest request
+	) {
+		return categoriaService.actualizarEstado(id, request);
 	}
 
 	@DeleteMapping("/{id}")

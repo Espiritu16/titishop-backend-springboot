@@ -1,6 +1,7 @@
 package com.titishop.usuarios.controller;
 
 import com.titishop.usuarios.dto.ActualizarUsuarioRequest;
+import com.titishop.usuarios.dto.ActualizarEstadoUsuarioRequest;
 import com.titishop.usuarios.dto.CrearUsuarioRequest;
 import com.titishop.usuarios.dto.UsuarioResponse;
 import com.titishop.usuarios.entity.EstadoUsuario;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -161,6 +163,26 @@ public class UsuarioController {
 			@Valid @RequestBody ActualizarUsuarioRequest request
 	) {
 		return usuarioService.actualizar(id, request);
+	}
+
+	@PatchMapping("/{id}/estado")
+	@Operation(summary = "Cambiar estado de usuario", description = "Actualiza solo el estado de un usuario.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Estado actualizado correctamente.",
+					content = @Content(schema = @Schema(implementation = UsuarioResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
+			@ApiResponse(responseCode = "404", description = "Usuario no encontrado.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	public UsuarioResponse actualizarEstado(
+			@Parameter(description = "ID del usuario.", example = "8ddf1f08-6f9d-4d17-9c42-a8b4d6bfc001")
+			@PathVariable UUID id,
+			@Valid @RequestBody ActualizarEstadoUsuarioRequest request
+	) {
+		return usuarioService.actualizarEstado(id, request);
 	}
 
 	@DeleteMapping("/{id}")
