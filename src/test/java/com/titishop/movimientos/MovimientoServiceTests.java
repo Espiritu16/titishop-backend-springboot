@@ -13,6 +13,7 @@ import com.titishop.movimientos.dto.MovimientoResponse;
 import com.titishop.movimientos.dto.RegistrarMovimientoRequest;
 import com.titishop.movimientos.dto.TipoMovimiento;
 import com.titishop.movimientos.entity.Movimiento;
+import com.titishop.movimientos.exception.MovimientoInvalidoException;
 import com.titishop.movimientos.exception.MovimientoNoEncontradoException;
 import com.titishop.movimientos.exception.ProveedorInactivoParaEntradaException;
 import com.titishop.movimientos.exception.StockInsuficienteException;
@@ -155,6 +156,35 @@ class MovimientoServiceTests {
 		assertThat(response.cantidad()).isEqualTo(4);
 		assertThat(response.stockAntes()).isEqualTo(12);
 		assertThat(response.stockDespues()).isEqualTo(8);
+	}
+
+	@Test
+	void registrarEntradaFallaSiCantidadSuperaMaximoPermitido() {
+		UUID productoId = UUID.randomUUID();
+		UUID proveedorId = UUID.randomUUID();
+		UUID usuarioId = UUID.randomUUID();
+		RegistrarMovimientoRequest request = new RegistrarMovimientoRequest(
+				productoId, proveedorId, usuarioId, TipoMovimiento.ENTRADA, 1001, null, "Reposicion"
+		);
+
+		assertThatThrownBy(() -> movimientoService.registrar(request))
+				.isInstanceOf(MovimientoInvalidoException.class)
+				.hasMessage("La cantidad debe estar entre 1 y 1000.");
+		verify(movimientoRepository, never()).save(any(Movimiento.class));
+	}
+
+	@Test
+	void registrarAjusteFallaSiStockDestinoSuperaMaximoPermitido() {
+		UUID productoId = UUID.randomUUID();
+		UUID usuarioId = UUID.randomUUID();
+		RegistrarMovimientoRequest request = new RegistrarMovimientoRequest(
+				productoId, null, usuarioId, TipoMovimiento.AJUSTE, null, 1001, "Conteo fisico"
+		);
+
+		assertThatThrownBy(() -> movimientoService.registrar(request))
+				.isInstanceOf(MovimientoInvalidoException.class)
+				.hasMessage("El stock destino debe estar entre 1 y 1000.");
+		verify(movimientoRepository, never()).save(any(Movimiento.class));
 	}
 
 	@Test

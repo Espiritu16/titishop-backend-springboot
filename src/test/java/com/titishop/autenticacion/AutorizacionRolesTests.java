@@ -2,6 +2,7 @@ package com.titishop.autenticacion;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
@@ -26,10 +27,20 @@ class AutorizacionRolesTests {
 	@Test
 	void productosRequiereAdministradorOAlmacenero() throws Exception {
 		mockMvc.perform(get("/api/productos").with(jwtSupervisor()))
-				.andExpect(status().isForbidden());
+				.andExpect(status().isForbidden())
+				.andExpect(jsonPath("$.message").value("No tienes permisos para realizar esta accion."))
+				.andExpect(jsonPath("$.path").value("/api/productos"));
 
 		mockMvc.perform(get("/api/productos").with(jwtAlmacenero()))
 				.andExpect(status().isOk());
+	}
+
+	@Test
+	void endpointProtegidoSinTokenRetornaErrorEstandar() throws Exception {
+		mockMvc.perform(get("/api/productos"))
+				.andExpect(status().isUnauthorized())
+				.andExpect(jsonPath("$.message").value("Debes iniciar sesion para acceder a este recurso."))
+				.andExpect(jsonPath("$.path").value("/api/productos"));
 	}
 
 	@Test

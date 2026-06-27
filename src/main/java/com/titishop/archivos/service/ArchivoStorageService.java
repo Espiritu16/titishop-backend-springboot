@@ -3,6 +3,7 @@ package com.titishop.archivos.service;
 import com.titishop.archivos.config.ArchivosProperties;
 import com.titishop.archivos.dto.ArchivoResponse;
 import com.titishop.archivos.exception.ArchivoInvalidoException;
+import com.titishop.archivos.exception.ArchivoStorageException;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +40,7 @@ public class ArchivoStorageService {
 		try {
 			Files.createDirectories(rootDir.resolve(DIRECTORIO_PRODUCTOS));
 		} catch (IOException ex) {
-			throw new IllegalStateException("No se pudo preparar el directorio de archivos.", ex);
+			throw new ArchivoStorageException("No se pudo preparar el directorio de archivos.", ex);
 		}
 	}
 
@@ -60,7 +61,7 @@ public class ArchivoStorageService {
 			Files.createDirectories(directorioDestino);
 			Files.copy(inputStream, destino, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException ex) {
-			throw new IllegalStateException("No se pudo guardar la imagen.", ex);
+			throw new ArchivoStorageException("No se pudo guardar la imagen.", ex);
 		}
 
 		String ruta = DIRECTORIO_PRODUCTOS + "/" + nombreArchivo;

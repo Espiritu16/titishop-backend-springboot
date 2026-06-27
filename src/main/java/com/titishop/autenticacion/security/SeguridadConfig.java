@@ -1,7 +1,12 @@
 package com.titishop.autenticacion.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.titishop.compartido.response.ErrorResponse;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -27,6 +32,8 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -43,11 +50,19 @@ public class SeguridadConfig {
 	}
 
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	ObjectMapper objectMapper() {
+		return new ObjectMapper().findAndRegisterModules();
+	}
+
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
 		return http
 					.csrf(csrf -> csrf.disable())
 					.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 					.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+					.exceptionHandling(exceptions -> exceptions
+							.authenticationEntryPoint(authenticationEntryPoint(objectMapper))
+							.accessDeniedHandler(accessDeniedHandler(objectMapper)))
 					.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
 								"/api/autenticacion/**",
@@ -74,6 +89,49 @@ public class SeguridadConfig {
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
 				.build();
+	}
+
+	private AuthenticationEntryPoint authenticationEntryPoint(ObjectMapper objectMapper) {
+		return (request, response, ex) -> writeErrorResponse(
+				response,
+				objectMapper,
+				HttpServletResponse.SC_UNAUTHORIZED,
+				"Unauthorized",
+				"Debes iniciar sesion para acceder a este recurso.",
+				request.getRequestURI()
+		);
+	}
+
+	private AccessDeniedHandler accessDeniedHandler(ObjectMapper objectMapper) {
+		return (request, response, ex) -> writeErrorResponse(
+				response,
+				objectMapper,
+				HttpServletResponse.SC_FORBIDDEN,
+				"Forbidden",
+				"No tienes permisos para realizar esta accion.",
+				request.getRequestURI()
+		);
+	}
+
+	private void writeErrorResponse(
+			HttpServletResponse response,
+			ObjectMapper objectMapper,
+			int status,
+			String error,
+			String message,
+			String path
+	) throws IOException {
+		response.setStatus(status);
+		response.setContentType("application/json");
+		ErrorResponse body = new ErrorResponse(
+				Instant.now(),
+				status,
+				error,
+				message,
+				path,
+				List.of()
+		);
+		objectMapper.writeValue(response.getOutputStream(), body);
 	}
 
 	@Bean

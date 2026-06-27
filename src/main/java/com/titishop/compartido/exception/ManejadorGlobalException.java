@@ -1,6 +1,7 @@
 package com.titishop.compartido.exception;
 
 import com.titishop.archivos.exception.ArchivoInvalidoException;
+import com.titishop.archivos.exception.ArchivoStorageException;
 import com.titishop.compartido.response.ErrorResponse;
 import com.titishop.inventario.exception.InventarioDuplicadoPorProductoException;
 import com.titishop.inventario.exception.InventarioInvalidoException;
@@ -35,12 +36,17 @@ import java.util.List;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class ManejadorGlobalException {
@@ -88,6 +94,11 @@ public class ManejadorGlobalException {
 		return build(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request, List.of());
 	}
 
+	@ExceptionHandler(ArchivoStorageException.class)
+	ResponseEntity<ErrorResponse> manejarArchivoStorage(ArchivoStorageException ex, HttpServletRequest request) {
+		return build(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), request, List.of());
+	}
+
 	@ExceptionHandler(InventarioDuplicadoPorProductoException.class)
 	ResponseEntity<ErrorResponse> manejarInventarioDuplicado(InventarioDuplicadoPorProductoException ex, HttpServletRequest request) {
 		return build(HttpStatus.CONFLICT, ex.getMessage(), request, List.of());
@@ -114,6 +125,11 @@ public class ManejadorGlobalException {
 		return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request, List.of());
 	}
 
+	@ExceptionHandler(SinCambiosException.class)
+	ResponseEntity<ErrorResponse> manejarSinCambios(SinCambiosException ex, HttpServletRequest request) {
+		return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request, List.of());
+	}
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	ResponseEntity<ErrorResponse> manejarValidacion(MethodArgumentNotValidException ex, HttpServletRequest request) {
 		List<String> details = ex.getBindingResult().getFieldErrors().stream()
@@ -135,10 +151,32 @@ public class ManejadorGlobalException {
 		return build(HttpStatus.UNAUTHORIZED, "Usuario o contrasena incorrectos.", request, List.of());
 	}
 
+	@ExceptionHandler(AccessDeniedException.class)
+	ResponseEntity<ErrorResponse> manejarAccesoDenegado(AccessDeniedException ex, HttpServletRequest request) {
+		return build(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta accion.", request, List.of());
+	}
+
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	ResponseEntity<ErrorResponse> manejarParametroTipoInvalido(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
 		String detail = ex.getName() + ": valor invalido.";
 		return build(HttpStatus.BAD_REQUEST, "Parametro de solicitud invalido.", request, List.of(detail));
+	}
+
+	@ExceptionHandler(MissingServletRequestParameterException.class)
+	ResponseEntity<ErrorResponse> manejarParametroFaltante(MissingServletRequestParameterException ex, HttpServletRequest request) {
+		String detail = ex.getParameterName() + ": parametro requerido.";
+		return build(HttpStatus.BAD_REQUEST, "Parametro de solicitud invalido.", request, List.of(detail));
+	}
+
+	@ExceptionHandler(MissingServletRequestPartException.class)
+	ResponseEntity<ErrorResponse> manejarParteFaltante(MissingServletRequestPartException ex, HttpServletRequest request) {
+		String detail = ex.getRequestPartName() + ": archivo requerido.";
+		return build(HttpStatus.BAD_REQUEST, "Archivo requerido.", request, List.of(detail));
+	}
+
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	ResponseEntity<ErrorResponse> manejarArchivoExcesivo(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+		return build(HttpStatus.UNPROCESSABLE_ENTITY, "La imagen supera el tamano maximo permitido.", request, List.of());
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
@@ -149,6 +187,11 @@ public class ManejadorGlobalException {
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	ResponseEntity<ErrorResponse> manejarCuerpoNoLegible(HttpMessageNotReadableException ex, HttpServletRequest request) {
 		return build(HttpStatus.BAD_REQUEST, "Cuerpo de solicitud invalido.", request, List.of());
+	}
+
+	@ExceptionHandler(NoResourceFoundException.class)
+	ResponseEntity<ErrorResponse> manejarRutaNoEncontrada(NoResourceFoundException ex, HttpServletRequest request) {
+		return build(HttpStatus.NOT_FOUND, "Ruta no encontrada.", request, List.of());
 	}
 
 	@ExceptionHandler(Exception.class)

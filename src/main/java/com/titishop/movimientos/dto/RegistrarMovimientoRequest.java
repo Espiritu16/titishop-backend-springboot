@@ -2,9 +2,9 @@ package com.titishop.movimientos.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
 
@@ -18,10 +18,10 @@ public record RegistrarMovimientoRequest(
 		@NotNull UUID usuarioId,
 		@Schema(description = "Tipo de movimiento.", example = "ENTRADA")
 		@NotNull TipoMovimiento tipo,
-		@Schema(description = "Cantidad de unidades involucradas.", example = "24", minimum = "1")
-		@Positive Integer cantidad,
-		@Schema(description = "Stock destino esperado para ajustes.", example = "140", minimum = "0", nullable = true)
-		@PositiveOrZero Integer stockDestino,
+		@Schema(description = "Cantidad de unidades involucradas.", example = "24", minimum = "1", maximum = "1000")
+		@Positive @Max(value = 1000, message = "debe ser menor que o igual a 1000") Integer cantidad,
+		@Schema(description = "Stock destino esperado para ajustes.", example = "140", minimum = "1", maximum = "1000", nullable = true)
+		@Positive @Max(value = 1000, message = "debe ser menor que o igual a 1000") Integer stockDestino,
 		@Schema(description = "Motivo operativo del movimiento.", example = "Ingreso por compra de reposicion semanal.", maxLength = 255)
 		@NotBlank @Size(max = 255) String motivo
 ) {
