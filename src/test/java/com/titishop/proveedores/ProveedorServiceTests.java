@@ -136,6 +136,34 @@ class ProveedorServiceTests {
 	}
 
 	@Test
+	void actualizarFallaSiNoHayCambios() {
+		UUID id = UUID.randomUUID();
+		Proveedor proveedor = new Proveedor(
+				"Proveedor Uno",
+				"20609998881",
+				"987654321",
+				"014700000",
+				"ventas@uno.pe",
+				"Av. Uno 123"
+		);
+		ActualizarProveedorRequest request = new ActualizarProveedorRequest(
+				" Proveedor Uno ",
+				"20609998881",
+				"987654321",
+				"014700000",
+				" VENTAS@UNO.PE ",
+				" Av. Uno 123 ",
+				EstadoProveedor.ACTIVO
+		);
+
+		when(proveedorRepository.findById(id)).thenReturn(Optional.of(proveedor));
+
+		assertThatThrownBy(() -> proveedorService.actualizar(id, request))
+				.hasMessage("No hay cambios para actualizar.");
+		verify(proveedorRepository, never()).save(proveedor);
+	}
+
+	@Test
 	void inactivarMarcaProveedorComoInactivo() {
 		UUID id = UUID.randomUUID();
 		Proveedor proveedor = new Proveedor(

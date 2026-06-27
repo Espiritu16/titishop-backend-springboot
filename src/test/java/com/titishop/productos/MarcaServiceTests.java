@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 import com.titishop.productos.dto.ActualizarMarcaRequest;
 import com.titishop.productos.dto.CrearMarcaRequest;
@@ -47,6 +48,17 @@ class MarcaServiceTests {
 		when(marcaRepository.findById(id)).thenReturn(Optional.empty());
 		assertThatThrownBy(() -> marcaService.actualizar(id, new ActualizarMarcaRequest("Logitech", EstadoCatalogo.ACTIVO)))
 				.isInstanceOf(MarcaNoEncontradaException.class);
+	}
+
+	@Test
+	void actualizarFallaSiNoHayCambios() {
+		UUID id = UUID.randomUUID();
+		Marca marca = new Marca("Logitech");
+		when(marcaRepository.findById(id)).thenReturn(Optional.of(marca));
+
+		assertThatThrownBy(() -> marcaService.actualizar(id, new ActualizarMarcaRequest(" Logitech ", EstadoCatalogo.ACTIVO)))
+				.hasMessage("No hay cambios para actualizar.");
+		verify(marcaRepository, never()).save(marca);
 	}
 
 	@Test

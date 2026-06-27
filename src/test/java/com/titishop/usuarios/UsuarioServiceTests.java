@@ -69,6 +69,26 @@ class UsuarioServiceTests {
 	}
 
 	@Test
+	void actualizarFallaSiNoHayCambios() {
+		UUID id = UUID.randomUUID();
+		Usuario usuario = new Usuario("Admin", "admin@titishop.pe", "hash", RolUsuario.ADMINISTRADOR);
+		ActualizarUsuarioRequest request = new ActualizarUsuarioRequest(
+				" Admin ",
+				" ADMIN@TITISHOP.PE ",
+				null,
+				RolUsuario.ADMINISTRADOR,
+				EstadoUsuario.ACTIVO
+		);
+
+		when(usuarioRepository.findById(id)).thenReturn(Optional.of(usuario));
+
+		assertThatThrownBy(() -> usuarioService.actualizar(id, request))
+				.hasMessage("No hay cambios para actualizar.");
+		verify(usuarioRepository, never()).save(usuario);
+		verify(passwordEncoder, never()).encode(any());
+	}
+
+	@Test
 	void inactivarMarcaUsuarioComoInactivo() {
 		UUID id = UUID.randomUUID();
 		Usuario usuario = new Usuario("Admin", "admin@titishop.pe", "hash", RolUsuario.ADMINISTRADOR);

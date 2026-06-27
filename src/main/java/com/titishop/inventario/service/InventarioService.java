@@ -1,6 +1,8 @@
 package com.titishop.inventario.service;
 
 import com.titishop.compartido.response.PaginaResponse;
+import com.titishop.compartido.exception.SinCambiosException;
+import com.titishop.inventario.dto.ActualizarEstadoInventarioRequest;
 import com.titishop.inventario.dto.ActualizarInventarioRequest;
 import com.titishop.inventario.dto.CrearInventarioRequest;
 import com.titishop.inventario.dto.EstadoInventario;
@@ -17,6 +19,7 @@ import com.titishop.productos.exception.ProductoNoEncontradoException;
 import com.titishop.productos.repository.ProductoRepository;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -85,10 +88,19 @@ public class InventarioService {
 	public InventarioResponse actualizar(UUID id, ActualizarInventarioRequest request) {
 		validarStockNoNegativo(request.stockMinimo(), "El stock minimo no puede ser negativo.");
 		Inventario inventario = buscarPorId(id);
+		String ubicacion = request.ubicacion().trim();
+		com.titishop.inventario.entity.EstadoInventario estado =
+				com.titishop.inventario.entity.EstadoInventario.valueOf(request.estado().name());
+		if (Objects.equals(inventario.getStockMinimo(), request.stockMinimo())
+				&& Objects.equals(inventario.getUbicacion(), ubicacion)
+				&& inventario.getEstado() == estado) {
+			throw new SinCambiosException();
+		}
+
 		inventario.actualizar(
 				request.stockMinimo(),
-				request.ubicacion().trim(),
-				com.titishop.inventario.entity.EstadoInventario.valueOf(request.estado().name())
+				ubicacion,
+				estado
 		);
 		return toResponse(inventarioRepository.save(inventario));
 	}
@@ -100,6 +112,24 @@ public class InventarioService {
 		}
 		inventario.inactivar();
 		inventarioRepository.save(inventario);
+	}
+
+	public InventarioResponse actualizarEstado(UUID id, ActualizarEstadoInventarioRequest request) {
+		Inventario inventario = buscarPorId(id);
+		if (request.estado() == EstadoInventario.INACTIVO) {
+			if (inventario.getStockActual() > 0) {
+				throw new InventarioInvalidoException("No se puede inactivar inventario con stock disponible.");
+			}
+			inventario.inactivar();
+			return toResponse(inventarioRepository.save(inventario));
+		}
+
+		inventario.actualizar(
+				inventario.getStockMinimo(),
+				inventario.getUbicacion(),
+				com.titishop.inventario.entity.EstadoInventario.ACTIVO
+		);
+		return toResponse(inventarioRepository.save(inventario));
 	}
 
 	private void validarStockNoNegativo(Integer stock, String mensaje) {

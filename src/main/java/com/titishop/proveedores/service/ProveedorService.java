@@ -1,6 +1,8 @@
 package com.titishop.proveedores.service;
 
 import com.titishop.compartido.response.PaginaResponse;
+import com.titishop.compartido.exception.SinCambiosException;
+import com.titishop.proveedores.dto.ActualizarEstadoProveedorRequest;
 import com.titishop.proveedores.dto.ActualizarProveedorRequest;
 import com.titishop.proveedores.dto.ConsultaRucProveedorResponse;
 import com.titishop.proveedores.dto.CrearProveedorRequest;
@@ -13,6 +15,7 @@ import com.titishop.proveedores.exception.RucProveedorDuplicadoException;
 import com.titishop.proveedores.repository.ProveedorRepository;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -90,6 +93,12 @@ public class ProveedorService {
 		Proveedor proveedor = buscarPorId(id);
 		String ruc = normalizarSoloDigitos(request.ruc());
 		String email = normalizarEmail(request.email());
+		String razonSocial = request.razonSocial().trim();
+		String celular = normalizarContactoNumerico(request.celular());
+		String telefono = normalizarContactoNumerico(request.telefono());
+		String direccion = request.direccion().trim();
+		com.titishop.proveedores.entity.EstadoProveedor estado =
+				com.titishop.proveedores.entity.EstadoProveedor.valueOf(request.estado().name());
 
 		if (proveedorRepository.existsByRucAndIdNot(ruc, id)) {
 			throw new RucProveedorDuplicadoException(ruc);
@@ -97,15 +106,24 @@ public class ProveedorService {
 		if (email != null && proveedorRepository.existsByEmailIgnoreCaseAndIdNot(email, id)) {
 			throw new EmailProveedorDuplicadoException(email);
 		}
+		if (Objects.equals(proveedor.getRazonSocial(), razonSocial)
+				&& Objects.equals(proveedor.getRuc(), ruc)
+				&& Objects.equals(proveedor.getCelular(), celular)
+				&& Objects.equals(proveedor.getTelefono(), telefono)
+				&& Objects.equals(proveedor.getEmail(), email)
+				&& Objects.equals(proveedor.getDireccion(), direccion)
+				&& proveedor.getEstado() == estado) {
+			throw new SinCambiosException();
+		}
 
 		proveedor.actualizar(
-				request.razonSocial().trim(),
+				razonSocial,
 				ruc,
-				normalizarContactoNumerico(request.celular()),
-				normalizarContactoNumerico(request.telefono()),
+				celular,
+				telefono,
 				email,
-				request.direccion().trim(),
-				com.titishop.proveedores.entity.EstadoProveedor.valueOf(request.estado().name())
+				direccion,
+				estado
 		);
 
 		return toResponse(proveedorRepository.save(proveedor));
@@ -115,6 +133,24 @@ public class ProveedorService {
 		Proveedor proveedor = buscarPorId(id);
 		proveedor.inactivar();
 		proveedorRepository.save(proveedor);
+	}
+
+	public ProveedorResponse actualizarEstado(UUID id, ActualizarEstadoProveedorRequest request) {
+		Proveedor proveedor = buscarPorId(id);
+		if (request.estado() == EstadoProveedor.INACTIVO) {
+			proveedor.inactivar();
+		} else {
+			proveedor.actualizar(
+					proveedor.getRazonSocial(),
+					proveedor.getRuc(),
+					proveedor.getCelular(),
+					proveedor.getTelefono(),
+					proveedor.getEmail(),
+					proveedor.getDireccion(),
+					com.titishop.proveedores.entity.EstadoProveedor.ACTIVO
+			);
+		}
+		return toResponse(proveedorRepository.save(proveedor));
 	}
 
 	private Proveedor buscarPorId(UUID id) {
