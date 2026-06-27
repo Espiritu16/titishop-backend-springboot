@@ -3,6 +3,8 @@ package com.titishop.compartido.exception;
 import com.titishop.archivos.exception.ArchivoInvalidoException;
 import com.titishop.archivos.exception.ArchivoStorageException;
 import com.titishop.compartido.response.ErrorResponse;
+import com.titishop.exportaciones.exception.ExportacionSinDatosException;
+import com.titishop.exportaciones.exception.FormatoExportacionInvalidoException;
 import com.titishop.inventario.exception.InventarioDuplicadoPorProductoException;
 import com.titishop.inventario.exception.InventarioInvalidoException;
 import com.titishop.inventario.exception.InventarioNoEncontradoException;
@@ -130,6 +132,16 @@ public class ManejadorGlobalException {
 		return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request, List.of());
 	}
 
+	@ExceptionHandler(FormatoExportacionInvalidoException.class)
+	ResponseEntity<ErrorResponse> manejarFormatoExportacionInvalido(FormatoExportacionInvalidoException ex, HttpServletRequest request) {
+		return build(HttpStatus.BAD_REQUEST, ex.getMessage(), request, List.of("formato: valores permitidos excel, pdf"));
+	}
+
+	@ExceptionHandler(ExportacionSinDatosException.class)
+	ResponseEntity<ErrorResponse> manejarExportacionSinDatos(ExportacionSinDatosException ex, HttpServletRequest request) {
+		return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request, List.of());
+	}
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	ResponseEntity<ErrorResponse> manejarValidacion(MethodArgumentNotValidException ex, HttpServletRequest request) {
 		List<String> details = ex.getBindingResult().getFieldErrors().stream()
@@ -181,7 +193,8 @@ public class ManejadorGlobalException {
 
 	@ExceptionHandler(IllegalArgumentException.class)
 	ResponseEntity<ErrorResponse> manejarArgumentoInvalido(IllegalArgumentException ex, HttpServletRequest request) {
-		return build(HttpStatus.BAD_REQUEST, "Parametro de solicitud invalido.", request, List.of());
+		List<String> details = ex.getMessage() == null || ex.getMessage().isBlank() ? List.of() : List.of(ex.getMessage());
+		return build(HttpStatus.BAD_REQUEST, "Parametro de solicitud invalido.", request, details);
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
