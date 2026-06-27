@@ -101,6 +101,18 @@ class InventarioServiceTests {
 	}
 
 	@Test
+	void actualizarFallaSiNoHayCambios() {
+		UUID inventarioId = UUID.randomUUID();
+		Inventario inventario = new Inventario(productoActivo(UUID.randomUUID()), 10, 5, "A-01");
+		ActualizarInventarioRequest request = new ActualizarInventarioRequest(5, " A-01 ", EstadoInventario.ACTIVO);
+		when(inventarioRepository.findById(inventarioId)).thenReturn(Optional.of(inventario));
+
+		assertThatThrownBy(() -> inventarioService.actualizar(inventarioId, request))
+				.hasMessage("No hay cambios para actualizar.");
+		verify(inventarioRepository, never()).save(inventario);
+	}
+
+	@Test
 	void inactivarFallaSiMantieneStockDisponible() {
 		UUID inventarioId = UUID.randomUUID();
 		Inventario inventario = new Inventario(productoActivo(UUID.randomUUID()), 10, 5, "A-01");

@@ -1,6 +1,8 @@
 package com.titishop.usuarios.service;
 
 import com.titishop.compartido.response.PaginaResponse;
+import com.titishop.compartido.exception.SinCambiosException;
+import com.titishop.usuarios.dto.ActualizarEstadoUsuarioRequest;
 import com.titishop.usuarios.dto.ActualizarUsuarioRequest;
 import com.titishop.usuarios.dto.CrearUsuarioRequest;
 import com.titishop.usuarios.dto.UsuarioResponse;
@@ -10,6 +12,7 @@ import com.titishop.usuarios.exception.UsuarioNoEncontradoException;
 import com.titishop.usuarios.repository.UsuarioRepository;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -79,19 +82,28 @@ public class UsuarioService {
 	public UsuarioResponse actualizar(UUID id, ActualizarUsuarioRequest request) {
 		Usuario usuario = buscarPorId(id);
 		String email = normalizarEmail(request.email());
+		String nombreCompleto = request.nombreCompleto().trim();
+		boolean cambiaPassword = request.password() != null && !request.password().isBlank();
 
 		if (usuarioRepository.existsByEmailIgnoreCaseAndIdNot(email, id)) {
 			throw new EmailUsuarioDuplicadoException(email);
 		}
+		if (!cambiaPassword
+				&& Objects.equals(usuario.getNombreCompleto(), nombreCompleto)
+				&& Objects.equals(usuario.getEmail(), email)
+				&& usuario.getRol() == request.rol()
+				&& usuario.getEstado() == request.estado()) {
+			throw new SinCambiosException();
+		}
 
 		usuario.actualizar(
-				request.nombreCompleto().trim(),
+				nombreCompleto,
 				email,
 				request.rol(),
 				request.estado()
 		);
 
-		if (request.password() != null && !request.password().isBlank()) {
+		if (cambiaPassword) {
 			usuario.actualizarPassword(passwordEncoder.encode(request.password()));
 		}
 
@@ -102,6 +114,21 @@ public class UsuarioService {
 		Usuario usuario = buscarPorId(id);
 		usuario.inactivar();
 		usuarioRepository.save(usuario);
+	}
+
+	public UsuarioResponse actualizarEstado(UUID id, ActualizarEstadoUsuarioRequest request) {
+		Usuario usuario = buscarPorId(id);
+		if (request.estado() == com.titishop.usuarios.entity.EstadoUsuario.INACTIVO) {
+			usuario.inactivar();
+		} else {
+			usuario.actualizar(
+					usuario.getNombreCompleto(),
+					usuario.getEmail(),
+					usuario.getRol(),
+					com.titishop.usuarios.entity.EstadoUsuario.ACTIVO
+			);
+		}
+		return toResponse(usuarioRepository.save(usuario));
 	}
 
 	private Usuario buscarPorId(UUID id) {

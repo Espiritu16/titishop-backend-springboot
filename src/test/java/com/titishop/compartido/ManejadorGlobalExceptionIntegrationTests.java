@@ -2,6 +2,7 @@ package com.titishop.compartido;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -101,5 +102,23 @@ class ManejadorGlobalExceptionIntegrationTests {
 						.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ALMACENERO"))))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.message").value("Parametro de solicitud invalido."));
+	}
+
+	@Test
+	void rutaApiNoEncontradaRetornaErrorEstandar() throws Exception {
+		mockMvc.perform(get("/api/no-existe")
+						.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMINISTRADOR"))))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("Ruta no encontrada."))
+				.andExpect(jsonPath("$.path").value("/api/no-existe"));
+	}
+
+	@Test
+	void archivoProductoFaltanteRetornaErrorEstandar() throws Exception {
+		mockMvc.perform(multipart("/api/archivos/productos")
+						.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ALMACENERO"))))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Archivo requerido."))
+				.andExpect(jsonPath("$.details[0]").value("archivo: archivo requerido."));
 	}
 }

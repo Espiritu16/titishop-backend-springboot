@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.any;
 
 import com.titishop.productos.dto.ActualizarProductoRequest;
 import com.titishop.productos.dto.CrearProductoRequest;
@@ -68,6 +70,30 @@ class ProductoServiceTests {
 
 		assertThatThrownBy(() -> productoService.actualizar(id, request))
 				.isInstanceOf(ProductoNoEncontradoException.class);
+	}
+
+	@Test
+	void actualizarFallaSiNoHayCambios() {
+		UUID id = UUID.randomUUID();
+		UUID categoriaId = UUID.randomUUID();
+		UUID marcaId = UUID.randomUUID();
+		Categoria categoria = new Categoria("Perifericos");
+		Marca marca = new Marca("Logi");
+		ReflectionTestUtils.setField(categoria, "id", categoriaId);
+		ReflectionTestUtils.setField(marca, "id", marcaId);
+		Producto producto = new Producto("Mouse", "SKU-2", "Optico", null, categoria, marca, BigDecimal.ONE, BigDecimal.TEN);
+		ActualizarProductoRequest request = new ActualizarProductoRequest(
+				" Mouse ", "sku-2", " Optico ", "", categoriaId, marcaId, BigDecimal.ONE, BigDecimal.TEN, EstadoProducto.ACTIVO
+		);
+
+		when(productoRepository.findById(id)).thenReturn(Optional.of(producto));
+		when(productoRepository.existsBySkuIgnoreCaseAndIdNot("SKU-2", id)).thenReturn(false);
+		when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+		when(marcaRepository.findById(marcaId)).thenReturn(Optional.of(marca));
+
+		assertThatThrownBy(() -> productoService.actualizar(id, request))
+				.hasMessage("No hay cambios para actualizar.");
+		verify(productoRepository, never()).save(any(Producto.class));
 	}
 
 	@Test

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 import com.titishop.productos.dto.ActualizarCategoriaRequest;
 import com.titishop.productos.dto.CrearCategoriaRequest;
@@ -47,6 +48,17 @@ class CategoriaServiceTests {
 		when(categoriaRepository.findById(id)).thenReturn(Optional.empty());
 		assertThatThrownBy(() -> categoriaService.actualizar(id, new ActualizarCategoriaRequest("Audio", EstadoCatalogo.ACTIVO)))
 				.isInstanceOf(CategoriaNoEncontradaException.class);
+	}
+
+	@Test
+	void actualizarFallaSiNoHayCambios() {
+		UUID id = UUID.randomUUID();
+		Categoria categoria = new Categoria("Audio");
+		when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoria));
+
+		assertThatThrownBy(() -> categoriaService.actualizar(id, new ActualizarCategoriaRequest(" Audio ", EstadoCatalogo.ACTIVO)))
+				.hasMessage("No hay cambios para actualizar.");
+		verify(categoriaRepository, never()).save(categoria);
 	}
 
 	@Test

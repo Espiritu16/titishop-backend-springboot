@@ -1,6 +1,7 @@
 package com.titishop.inventario.controller;
 
 import com.titishop.inventario.dto.ActualizarInventarioRequest;
+import com.titishop.inventario.dto.ActualizarEstadoInventarioRequest;
 import com.titishop.inventario.dto.CrearInventarioRequest;
 import com.titishop.inventario.dto.EstadoInventario;
 import com.titishop.inventario.dto.InventarioResponse;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -162,6 +164,28 @@ public class InventarioController {
 			@Valid @RequestBody ActualizarInventarioRequest request
 	) {
 		return inventarioService.actualizar(id, request);
+	}
+
+	@PatchMapping("/{id}/estado")
+	@Operation(summary = "Cambiar estado de inventario", description = "Actualiza solo el estado de un registro de inventario.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Estado actualizado correctamente.",
+					content = @Content(schema = @Schema(implementation = InventarioResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
+			@ApiResponse(responseCode = "404", description = "Inventario no encontrado.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "422", description = "Regla de negocio invalida para cambiar el estado.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	public InventarioResponse actualizarEstado(
+			@Parameter(description = "ID del inventario.", example = "7e11af9c-a8b3-4b63-b89f-2ac3f6852101")
+			@PathVariable UUID id,
+			@Valid @RequestBody ActualizarEstadoInventarioRequest request
+	) {
+		return inventarioService.actualizarEstado(id, request);
 	}
 
 	@DeleteMapping("/{id}")

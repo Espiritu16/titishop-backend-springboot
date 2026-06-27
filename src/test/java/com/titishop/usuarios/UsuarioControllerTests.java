@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -109,5 +110,26 @@ class UsuarioControllerTests {
 
 		mockMvc.perform(delete("/api/usuarios/{id}", UUID.randomUUID()))
 				.andExpect(status().isNoContent());
+	}
+
+	@Test
+	void actualizarEstadoConPatchRetorna200() throws Exception {
+		UUID id = UUID.randomUUID();
+		UsuarioResponse response = new UsuarioResponse(
+				id,
+				"Admin",
+				"admin@titishop.pe",
+				RolUsuario.ADMINISTRADOR,
+				EstadoUsuario.INACTIVO,
+				Instant.now(),
+				null
+		);
+		when(usuarioService.actualizarEstado(any(UUID.class), any())).thenReturn(response);
+
+		mockMvc.perform(patch("/api/usuarios/{id}/estado", id)
+						.contentType("application/json")
+						.content("{\"estado\":\"INACTIVO\"}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.estado").value("INACTIVO"));
 	}
 }

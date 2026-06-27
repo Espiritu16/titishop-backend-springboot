@@ -39,6 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MovimientoService {
 
+	private static final int VALOR_MAXIMO_MOVIMIENTO = 1000;
+
 	private final MovimientoRepository movimientoRepository;
 	private final ProductoRepository productoRepository;
 	private final InventarioRepository inventarioRepository;
@@ -92,6 +94,7 @@ public class MovimientoService {
 	}
 
 	public MovimientoResponse registrar(RegistrarMovimientoRequest request) {
+		validarRangoOperativo(request);
 		Producto producto = buscarProductoActivo(request.productoId());
 		Inventario inventario = buscarInventarioActivo(request.productoId());
 		Proveedor proveedor = resolverProveedor(request);
@@ -210,10 +213,22 @@ public class MovimientoService {
 	}
 
 	private int stockDestinoRequerido(RegistrarMovimientoRequest request) {
-		if (request.stockDestino() == null || request.stockDestino() < 0) {
-			throw new MovimientoInvalidoException("El stock destino es obligatorio y no puede ser negativo para ajustes.");
+		if (request.stockDestino() == null || request.stockDestino() <= 0) {
+			throw new MovimientoInvalidoException("El stock destino es obligatorio y debe ser mayor que cero para ajustes.");
 		}
 		return request.stockDestino();
+	}
+
+	private void validarRangoOperativo(RegistrarMovimientoRequest request) {
+		if (request.tipo() == com.titishop.movimientos.dto.TipoMovimiento.AJUSTE) {
+			if (request.stockDestino() != null && request.stockDestino() > VALOR_MAXIMO_MOVIMIENTO) {
+				throw new MovimientoInvalidoException("El stock destino debe estar entre 1 y 1000.");
+			}
+			return;
+		}
+		if (request.cantidad() != null && request.cantidad() > VALOR_MAXIMO_MOVIMIENTO) {
+			throw new MovimientoInvalidoException("La cantidad debe estar entre 1 y 1000.");
+		}
 	}
 
 	private int calcularStockRevertido(Movimiento movimiento, int stockActual) {

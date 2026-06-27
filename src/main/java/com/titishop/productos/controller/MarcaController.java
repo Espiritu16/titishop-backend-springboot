@@ -1,6 +1,7 @@
 package com.titishop.productos.controller;
 
 import com.titishop.productos.dto.ActualizarMarcaRequest;
+import com.titishop.productos.dto.ActualizarEstadoCatalogoRequest;
 import com.titishop.productos.dto.CrearMarcaRequest;
 import com.titishop.productos.dto.EstadoCatalogo;
 import com.titishop.productos.dto.MarcaResponse;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -153,6 +155,26 @@ public class MarcaController {
 			@Valid @RequestBody ActualizarMarcaRequest request
 	) {
 		return marcaService.actualizar(id, request);
+	}
+
+	@PatchMapping("/{id}/estado")
+	@Operation(summary = "Cambiar estado de marca", description = "Actualiza solo el estado de una marca.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Estado actualizado correctamente.",
+					content = @Content(schema = @Schema(implementation = MarcaResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
+			@ApiResponse(responseCode = "404", description = "Marca no encontrada.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	public MarcaResponse actualizarEstado(
+			@Parameter(description = "ID de la marca.", example = "1ab2cd34-56ef-7890-ab12-cd34ef567890")
+			@PathVariable UUID id,
+			@Valid @RequestBody ActualizarEstadoCatalogoRequest request
+	) {
+		return marcaService.actualizarEstado(id, request);
 	}
 
 	@DeleteMapping("/{id}")

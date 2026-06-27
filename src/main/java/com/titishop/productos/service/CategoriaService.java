@@ -1,6 +1,8 @@
 package com.titishop.productos.service;
 
 import com.titishop.compartido.response.PaginaResponse;
+import com.titishop.compartido.exception.SinCambiosException;
+import com.titishop.productos.dto.ActualizarEstadoCatalogoRequest;
 import com.titishop.productos.dto.ActualizarCategoriaRequest;
 import com.titishop.productos.dto.CategoriaResponse;
 import com.titishop.productos.dto.CrearCategoriaRequest;
@@ -69,7 +71,13 @@ public class CategoriaService {
 			throw new NombreCategoriaDuplicadoException(nombre);
 		}
 
-		categoria.actualizar(nombre, com.titishop.productos.entity.EstadoCatalogo.valueOf(request.estado().name()));
+		com.titishop.productos.entity.EstadoCatalogo estado =
+				com.titishop.productos.entity.EstadoCatalogo.valueOf(request.estado().name());
+		if (categoria.getNombre().equals(nombre) && categoria.getEstado() == estado) {
+			throw new SinCambiosException();
+		}
+
+		categoria.actualizar(nombre, estado);
 		return toResponse(categoriaRepository.save(categoria));
 	}
 
@@ -77,6 +85,12 @@ public class CategoriaService {
 		com.titishop.productos.entity.Categoria categoria = buscarPorId(id);
 		categoria.inactivar();
 		categoriaRepository.save(categoria);
+	}
+
+	public CategoriaResponse actualizarEstado(UUID id, ActualizarEstadoCatalogoRequest request) {
+		com.titishop.productos.entity.Categoria categoria = buscarPorId(id);
+		categoria.actualizar(categoria.getNombre(), com.titishop.productos.entity.EstadoCatalogo.valueOf(request.estado().name()));
+		return toResponse(categoriaRepository.save(categoria));
 	}
 
 	private com.titishop.productos.entity.Categoria buscarPorId(UUID id) {

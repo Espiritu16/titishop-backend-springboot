@@ -8,6 +8,7 @@ import com.titishop.usuarios.repository.UsuarioRepository;
 import java.time.Instant;
 import java.util.Locale;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,7 @@ public class AutenticacionService {
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.password()));
 
 		Usuario usuario = usuarioRepository.findByEmailIgnoreCase(email)
-				.orElseThrow();
+				.orElseThrow(() -> new BadCredentialsException("Usuario o contrasena incorrectos."));
 		Instant emitidoEn = Instant.now();
 		String rol = usuario.getRol().name();
 		String token = jwtService.generarToken(usuario.getId(), usuario.getEmail(), usuario.getNombreCompleto(), rol, emitidoEn);

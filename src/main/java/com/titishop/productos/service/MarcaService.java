@@ -1,6 +1,8 @@
 package com.titishop.productos.service;
 
 import com.titishop.compartido.response.PaginaResponse;
+import com.titishop.compartido.exception.SinCambiosException;
+import com.titishop.productos.dto.ActualizarEstadoCatalogoRequest;
 import com.titishop.productos.dto.ActualizarMarcaRequest;
 import com.titishop.productos.dto.CrearMarcaRequest;
 import com.titishop.productos.dto.EstadoCatalogo;
@@ -70,7 +72,13 @@ public class MarcaService {
 			throw new NombreMarcaDuplicadoException(nombre);
 		}
 
-		marca.actualizar(nombre, com.titishop.productos.entity.EstadoCatalogo.valueOf(request.estado().name()));
+		com.titishop.productos.entity.EstadoCatalogo estado =
+				com.titishop.productos.entity.EstadoCatalogo.valueOf(request.estado().name());
+		if (marca.getNombre().equals(nombre) && marca.getEstado() == estado) {
+			throw new SinCambiosException();
+		}
+
+		marca.actualizar(nombre, estado);
 		return toResponse(marcaRepository.save(marca));
 	}
 
@@ -78,6 +86,12 @@ public class MarcaService {
 		Marca marca = buscarPorId(id);
 		marca.inactivar();
 		marcaRepository.save(marca);
+	}
+
+	public MarcaResponse actualizarEstado(UUID id, ActualizarEstadoCatalogoRequest request) {
+		Marca marca = buscarPorId(id);
+		marca.actualizar(marca.getNombre(), com.titishop.productos.entity.EstadoCatalogo.valueOf(request.estado().name()));
+		return toResponse(marcaRepository.save(marca));
 	}
 
 	private Marca buscarPorId(UUID id) {

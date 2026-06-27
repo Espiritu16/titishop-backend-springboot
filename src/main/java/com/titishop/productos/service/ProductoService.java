@@ -1,6 +1,8 @@
 package com.titishop.productos.service;
 
 import com.titishop.compartido.response.PaginaResponse;
+import com.titishop.compartido.exception.SinCambiosException;
+import com.titishop.productos.dto.ActualizarEstadoProductoRequest;
 import com.titishop.productos.dto.ActualizarProductoRequest;
 import com.titishop.productos.dto.CrearProductoRequest;
 import com.titishop.productos.dto.EstadoProducto;
@@ -22,6 +24,7 @@ import com.titishop.productos.repository.ProductoRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -114,17 +117,34 @@ public class ProductoService {
 
 		Categoria categoria = buscarCategoria(request.categoriaId());
 		Marca marca = buscarMarca(request.marcaId());
+		String nombre = request.nombre().trim();
+		String descripcion = request.descripcion().trim();
+		String imagenUrl = normalizarImagen(request.imagenUrl());
+		com.titishop.productos.entity.EstadoProducto estado =
+				com.titishop.productos.entity.EstadoProducto.valueOf(request.estado().name());
+
+		if (Objects.equals(producto.getNombre(), nombre)
+				&& Objects.equals(producto.getSku(), sku)
+				&& Objects.equals(producto.getDescripcion(), descripcion)
+				&& Objects.equals(producto.getImagenUrl(), imagenUrl)
+				&& Objects.equals(producto.getCategoria().getId(), categoria.getId())
+				&& Objects.equals(producto.getMarca().getId(), marca.getId())
+				&& producto.getPrecioCompra().compareTo(request.precioCompra()) == 0
+				&& producto.getPrecioVenta().compareTo(request.precioVenta()) == 0
+				&& producto.getEstado() == estado) {
+			throw new SinCambiosException();
+		}
 
 		producto.actualizar(
-				request.nombre().trim(),
+				nombre,
 				sku,
-				request.descripcion().trim(),
-				normalizarImagen(request.imagenUrl()),
+				descripcion,
+				imagenUrl,
 				categoria,
 				marca,
 				request.precioCompra(),
 				request.precioVenta(),
-				com.titishop.productos.entity.EstadoProducto.valueOf(request.estado().name())
+				estado
 		);
 		return toResponse(productoRepository.save(producto));
 	}
@@ -135,6 +155,29 @@ public class ProductoService {
 		productoRepository.save(producto);
 	}
 
+	public ProductoResponse actualizarEstado(UUID id, ActualizarEstadoProductoRequest request) {
+		Producto producto = buscarPorId(id);
+		if (request.estado() == EstadoProducto.ACTIVO) {
+			validarCategoriaActiva(producto.getCategoria());
+			validarMarcaActiva(producto.getMarca());
+			producto.actualizar(
+					producto.getNombre(),
+					producto.getSku(),
+					producto.getDescripcion(),
+					producto.getImagenUrl(),
+					producto.getCategoria(),
+					producto.getMarca(),
+					producto.getPrecioCompra(),
+					producto.getPrecioVenta(),
+					com.titishop.productos.entity.EstadoProducto.ACTIVO
+			);
+			return toResponse(productoRepository.save(producto));
+		}
+
+		producto.inactivar();
+		return toResponse(productoRepository.save(producto));
+	}
+
 	private Producto buscarPorId(UUID id) {
 		return productoRepository.findById(id)
 				.orElseThrow(() -> new ProductoNoEncontradoException(id));
@@ -143,19 +186,27 @@ public class ProductoService {
 	private Categoria buscarCategoria(UUID categoriaId) {
 		Categoria categoria = categoriaRepository.findById(categoriaId)
 				.orElseThrow(() -> new CategoriaNoEncontradaException(categoriaId));
-		if (categoria.getEstado() != EstadoCatalogo.ACTIVO) {
-			throw new CategoriaInactivaParaProductoException(categoriaId);
-		}
+		validarCategoriaActiva(categoria);
 		return categoria;
 	}
 
 	private Marca buscarMarca(UUID marcaId) {
 		Marca marca = marcaRepository.findById(marcaId)
 				.orElseThrow(() -> new MarcaNoEncontradaException(marcaId));
-		if (marca.getEstado() != EstadoCatalogo.ACTIVO) {
-			throw new MarcaInactivaParaProductoException(marcaId);
-		}
+		validarMarcaActiva(marca);
 		return marca;
+	}
+
+	private void validarCategoriaActiva(Categoria categoria) {
+		if (categoria.getEstado() != EstadoCatalogo.ACTIVO) {
+			throw new CategoriaInactivaParaProductoException(categoria.getId());
+		}
+	}
+
+	private void validarMarcaActiva(Marca marca) {
+		if (marca.getEstado() != EstadoCatalogo.ACTIVO) {
+			throw new MarcaInactivaParaProductoException(marca.getId());
+		}
 	}
 
 	private void validarPrecios(BigDecimal precioCompra, BigDecimal precioVenta) {

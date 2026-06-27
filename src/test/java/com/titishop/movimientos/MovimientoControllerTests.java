@@ -82,6 +82,32 @@ class MovimientoControllerTests {
 	}
 
 	@Test
+	void registrarConCantidadMayorAlMaximoRetorna400() throws Exception {
+		RegistrarMovimientoRequest request = new RegistrarMovimientoRequest(
+				UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), TipoMovimiento.ENTRADA, 1001, null, "Reposicion"
+		);
+
+		mockMvc.perform(post("/api/movimientos")
+						.contentType("application/json")
+						.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.details[0]").value("cantidad: debe ser menor que o igual a 1000"));
+	}
+
+	@Test
+	void registrarAjusteConStockDestinoMayorAlMaximoRetorna400() throws Exception {
+		RegistrarMovimientoRequest request = new RegistrarMovimientoRequest(
+				UUID.randomUUID(), null, UUID.randomUUID(), TipoMovimiento.AJUSTE, null, 1001, "Conteo fisico"
+		);
+
+		mockMvc.perform(post("/api/movimientos")
+						.contentType("application/json")
+						.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.details[0]").value("stockDestino: debe ser menor que o igual a 1000"));
+	}
+
+	@Test
 	void listarRetornaMovimientos() throws Exception {
 		UUID productoId = UUID.randomUUID();
 		UUID usuarioId = UUID.randomUUID();

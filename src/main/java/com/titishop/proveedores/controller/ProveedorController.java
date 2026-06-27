@@ -1,6 +1,7 @@
 package com.titishop.proveedores.controller;
 
 import com.titishop.proveedores.dto.ActualizarProveedorRequest;
+import com.titishop.proveedores.dto.ActualizarEstadoProveedorRequest;
 import com.titishop.proveedores.dto.ConsultaRucProveedorResponse;
 import com.titishop.proveedores.dto.CrearProveedorRequest;
 import com.titishop.proveedores.dto.EstadoProveedor;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -186,6 +188,26 @@ public class ProveedorController {
 			@Valid @RequestBody ActualizarProveedorRequest request
 	) {
 		return proveedorService.actualizar(id, request);
+	}
+
+	@PatchMapping("/{id}/estado")
+	@Operation(summary = "Cambiar estado de proveedor", description = "Actualiza solo el estado de un proveedor.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Estado actualizado correctamente.",
+					content = @Content(schema = @Schema(implementation = ProveedorResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
+			@ApiResponse(responseCode = "404", description = "Proveedor no encontrado.",
+					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	})
+	public ProveedorResponse actualizarEstado(
+			@Parameter(description = "ID del proveedor.", example = "5a81e2d0-55f8-4a3b-8d65-febec9959002")
+			@PathVariable UUID id,
+			@Valid @RequestBody ActualizarEstadoProveedorRequest request
+	) {
+		return proveedorService.actualizarEstado(id, request);
 	}
 
 	@DeleteMapping("/{id}")
