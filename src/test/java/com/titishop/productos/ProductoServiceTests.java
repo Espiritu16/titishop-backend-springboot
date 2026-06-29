@@ -22,6 +22,10 @@ import com.titishop.productos.repository.CategoriaRepository;
 import com.titishop.productos.repository.MarcaRepository;
 import com.titishop.productos.repository.ProductoRepository;
 import com.titishop.productos.service.ProductoService;
+import com.titishop.proveedores.entity.EstadoProveedor;
+import com.titishop.proveedores.entity.Proveedor;
+import com.titishop.proveedores.exception.ProveedorNoEncontradoException;
+import com.titishop.proveedores.repository.ProveedorRepository;
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,18 +45,20 @@ class ProductoServiceTests {
 	private CategoriaRepository categoriaRepository;
 	@Mock
 	private MarcaRepository marcaRepository;
+	@Mock
+	private ProveedorRepository proveedorRepository;
 
 	private ProductoService productoService;
 
 	@BeforeEach
 	void setUp() {
-		productoService = new ProductoService(productoRepository, categoriaRepository, marcaRepository);
+		productoService = new ProductoService(productoRepository, categoriaRepository, marcaRepository, proveedorRepository);
 	}
 
 	@Test
 	void crearFallaConSkuDuplicado() {
 		CrearProductoRequest request = new CrearProductoRequest(
-				"Teclado", "sku-1", "Mecanico", null, UUID.randomUUID(), UUID.randomUUID(), BigDecimal.ONE, BigDecimal.TEN
+				"Teclado", "sku-1", "Mecanico", null, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), "China", BigDecimal.ONE, BigDecimal.TEN
 		);
 		when(productoRepository.existsBySkuIgnoreCase("SKU-1")).thenReturn(true);
 
@@ -64,7 +70,7 @@ class ProductoServiceTests {
 	void actualizarFallaSiNoExisteProducto() {
 		UUID id = UUID.randomUUID();
 		ActualizarProductoRequest request = new ActualizarProductoRequest(
-				"Mouse", "sku-2", "Optico", null, UUID.randomUUID(), UUID.randomUUID(), BigDecimal.ONE, BigDecimal.TEN, EstadoProducto.ACTIVO
+				"Mouse", "sku-2", "Optico", null, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), "China", BigDecimal.ONE, BigDecimal.TEN, EstadoProducto.ACTIVO
 		);
 		when(productoRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -77,19 +83,22 @@ class ProductoServiceTests {
 		UUID id = UUID.randomUUID();
 		UUID categoriaId = UUID.randomUUID();
 		UUID marcaId = UUID.randomUUID();
+		UUID proveedorId = UUID.randomUUID();
 		Categoria categoria = new Categoria("Perifericos");
 		Marca marca = new Marca("Logi");
+		Proveedor proveedor = proveedorActivo(proveedorId);
 		ReflectionTestUtils.setField(categoria, "id", categoriaId);
 		ReflectionTestUtils.setField(marca, "id", marcaId);
-		Producto producto = new Producto("Mouse", "SKU-2", "Optico", null, categoria, marca, BigDecimal.ONE, BigDecimal.TEN);
+		Producto producto = new Producto("Mouse", "SKU-2", "Optico", null, categoria, marca, proveedor, "China", BigDecimal.ONE, BigDecimal.TEN);
 		ActualizarProductoRequest request = new ActualizarProductoRequest(
-				" Mouse ", "sku-2", " Optico ", "", categoriaId, marcaId, BigDecimal.ONE, BigDecimal.TEN, EstadoProducto.ACTIVO
+				" Mouse ", "sku-2", " Optico ", "", categoriaId, marcaId, proveedorId, " China ", BigDecimal.ONE, BigDecimal.TEN, EstadoProducto.ACTIVO
 		);
 
 		when(productoRepository.findById(id)).thenReturn(Optional.of(producto));
 		when(productoRepository.existsBySkuIgnoreCaseAndIdNot("SKU-2", id)).thenReturn(false);
 		when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
 		when(marcaRepository.findById(marcaId)).thenReturn(Optional.of(marca));
+		when(proveedorRepository.findById(proveedorId)).thenReturn(Optional.of(proveedor));
 
 		assertThatThrownBy(() -> productoService.actualizar(id, request))
 				.hasMessage("No hay cambios para actualizar.");
@@ -101,7 +110,7 @@ class ProductoServiceTests {
 		UUID categoriaId = UUID.randomUUID();
 		UUID marcaId = UUID.randomUUID();
 		CrearProductoRequest request = new CrearProductoRequest(
-				"Mouse", "sku-cat", "Optico", null, categoriaId, marcaId, BigDecimal.ONE, BigDecimal.TEN
+				"Mouse", "sku-cat", "Optico", null, categoriaId, marcaId, UUID.randomUUID(), "China", BigDecimal.ONE, BigDecimal.TEN
 		);
 		Categoria categoria = new Categoria("Perifericos");
 		ReflectionTestUtils.setField(categoria, "estado", com.titishop.productos.entity.EstadoCatalogo.INACTIVO);
@@ -118,7 +127,7 @@ class ProductoServiceTests {
 		UUID categoriaId = UUID.randomUUID();
 		UUID marcaId = UUID.randomUUID();
 		CrearProductoRequest request = new CrearProductoRequest(
-				"Mouse", "sku-marca", "Optico", null, categoriaId, marcaId, BigDecimal.ONE, BigDecimal.TEN
+				"Mouse", "sku-marca", "Optico", null, categoriaId, marcaId, UUID.randomUUID(), "China", BigDecimal.ONE, BigDecimal.TEN
 		);
 		Categoria categoria = new Categoria("Perifericos");
 		Marca marca = new Marca("Logi");
@@ -135,7 +144,7 @@ class ProductoServiceTests {
 	@Test
 	void crearFallaSiPrecioVentaEsMenorQueCompra() {
 		CrearProductoRequest request = new CrearProductoRequest(
-				"Mouse", "sku-precio", "Optico", null, UUID.randomUUID(), UUID.randomUUID(), BigDecimal.TEN, BigDecimal.ONE
+				"Mouse", "sku-precio", "Optico", null, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), "China", BigDecimal.TEN, BigDecimal.ONE
 		);
 
 		assertThatThrownBy(() -> productoService.crear(request))
@@ -147,9 +156,10 @@ class ProductoServiceTests {
 		UUID id = UUID.randomUUID();
 		Categoria categoria = new Categoria("Perifericos");
 		Marca marca = new Marca();
+		Proveedor proveedor = proveedorActivo(UUID.randomUUID());
 		ReflectionTestUtils.setField(marca, "id", UUID.randomUUID());
 		ReflectionTestUtils.setField(marca, "nombre", "Logi");
-		Producto producto = new Producto("Mouse", "SKU-3", "Optico", null, categoria, marca, BigDecimal.ONE, BigDecimal.TEN);
+		Producto producto = new Producto("Mouse", "SKU-3", "Optico", null, categoria, marca, proveedor, "China", BigDecimal.ONE, BigDecimal.TEN);
 
 		when(productoRepository.findById(id)).thenReturn(Optional.of(producto));
 
@@ -157,5 +167,80 @@ class ProductoServiceTests {
 
 		assertThat(producto.getEstado().name()).isEqualTo("INACTIVO");
 		verify(productoRepository).save(producto);
+	}
+
+	@Test
+	void crearIncluyePaisOrigenYProveedorDirecto() {
+		UUID categoriaId = UUID.randomUUID();
+		UUID marcaId = UUID.randomUUID();
+		UUID proveedorId = UUID.randomUUID();
+		Categoria categoria = new Categoria("Perifericos");
+		Marca marca = new Marca("Logi");
+		Proveedor proveedor = proveedorActivo(proveedorId);
+		ReflectionTestUtils.setField(categoria, "id", categoriaId);
+		ReflectionTestUtils.setField(marca, "id", marcaId);
+		CrearProductoRequest request = new CrearProductoRequest(
+				"Mouse", "sku-prov", "Optico", null, categoriaId, marcaId, proveedorId, "  China  ", BigDecimal.ONE, BigDecimal.TEN
+		);
+
+		when(productoRepository.existsBySkuIgnoreCase("SKU-PROV")).thenReturn(false);
+		when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+		when(marcaRepository.findById(marcaId)).thenReturn(Optional.of(marca));
+		when(proveedorRepository.findById(proveedorId)).thenReturn(Optional.of(proveedor));
+		when(productoRepository.save(any(Producto.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+		var response = productoService.crear(request);
+
+		assertThat(response.proveedorId()).isEqualTo(proveedorId);
+		assertThat(response.proveedorRazonSocial()).isEqualTo("Proveedor Uno");
+		assertThat(response.paisOrigen()).isEqualTo("China");
+	}
+
+	@Test
+	void crearFallaSiProveedorNoExiste() {
+		UUID categoriaId = UUID.randomUUID();
+		UUID marcaId = UUID.randomUUID();
+		UUID proveedorId = UUID.randomUUID();
+		Categoria categoria = new Categoria("Perifericos");
+		Marca marca = new Marca("Logi");
+		CrearProductoRequest request = new CrearProductoRequest(
+				"Mouse", "sku-sin-prov", "Optico", null, categoriaId, marcaId, proveedorId, "China", BigDecimal.ONE, BigDecimal.TEN
+		);
+
+		when(productoRepository.existsBySkuIgnoreCase("SKU-SIN-PROV")).thenReturn(false);
+		when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+		when(marcaRepository.findById(marcaId)).thenReturn(Optional.of(marca));
+		when(proveedorRepository.findById(proveedorId)).thenReturn(Optional.empty());
+
+		assertThatThrownBy(() -> productoService.crear(request))
+				.isInstanceOf(ProveedorNoEncontradoException.class);
+	}
+
+	@Test
+	void crearFallaSiProveedorEstaInactivo() {
+		UUID categoriaId = UUID.randomUUID();
+		UUID marcaId = UUID.randomUUID();
+		UUID proveedorId = UUID.randomUUID();
+		Categoria categoria = new Categoria("Perifericos");
+		Marca marca = new Marca("Logi");
+		Proveedor proveedor = proveedorActivo(proveedorId);
+		ReflectionTestUtils.setField(proveedor, "estado", EstadoProveedor.INACTIVO);
+		CrearProductoRequest request = new CrearProductoRequest(
+				"Mouse", "sku-prov-inactivo", "Optico", null, categoriaId, marcaId, proveedorId, "China", BigDecimal.ONE, BigDecimal.TEN
+		);
+
+		when(productoRepository.existsBySkuIgnoreCase("SKU-PROV-INACTIVO")).thenReturn(false);
+		when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+		when(marcaRepository.findById(marcaId)).thenReturn(Optional.of(marca));
+		when(proveedorRepository.findById(proveedorId)).thenReturn(Optional.of(proveedor));
+
+		assertThatThrownBy(() -> productoService.crear(request))
+				.hasMessageContaining("proveedor no esta activo");
+	}
+
+	private Proveedor proveedorActivo(UUID id) {
+		Proveedor proveedor = new Proveedor("Proveedor Uno", "20609998881", "987654321", "014700000", "ventas@uno.pe", "Av. Uno 123");
+		ReflectionTestUtils.setField(proveedor, "id", id);
+		return proveedor;
 	}
 }

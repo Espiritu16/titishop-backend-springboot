@@ -59,9 +59,10 @@ public class MovimientoController {
 			@RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
 			@RequestParam(required = false) String busqueda,
 			@RequestParam(required = false) TipoMovimiento tipo,
-			@RequestParam(required = false) Boolean anulado
+			@RequestParam(required = false) Boolean anulado,
+			@RequestParam(required = false) UUID productoId
 	) {
-		return movimientoService.listar(page, size, busqueda, tipo, anulado);
+		return movimientoService.listar(page, size, busqueda, tipo, anulado, productoId);
 	}
 
 	@GetMapping("/{id}")

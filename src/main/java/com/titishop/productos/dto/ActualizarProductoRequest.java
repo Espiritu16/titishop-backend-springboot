@@ -22,6 +22,10 @@ public record ActualizarProductoRequest(
 		@NotNull UUID categoriaId,
 		@Schema(description = "Identificador de la marca relacionada.", example = "1ab2cd34-56ef-7890-ab12-cd34ef567890")
 		@NotNull UUID marcaId,
+		@Schema(description = "Identificador del proveedor principal relacionado.", example = "5a81e2d0-55f8-4a3b-8d65-febec9959002")
+		@NotNull UUID proveedorId,
+		@Schema(description = "Pais de origen del producto importado.", example = "China", maxLength = 80)
+		@NotBlank @Size(max = 80) String paisOrigen,
 		@Schema(description = "Precio de compra actual.", example = "3.30", minimum = "0")
 		@NotNull @DecimalMin(value = "0.0", inclusive = true) BigDecimal precioCompra,
 		@Schema(description = "Precio de venta actual.", example = "4.80", minimum = "0")

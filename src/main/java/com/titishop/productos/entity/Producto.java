@@ -1,6 +1,7 @@
 package com.titishop.productos.entity;
 
 import com.titishop.compartido.entity.AuditoriaEntity;
+import com.titishop.proveedores.entity.Proveedor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,6 +45,13 @@ public class Producto extends AuditoriaEntity {
 	@JoinColumn(name = "marca_id", nullable = false)
 	private Marca marca;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "proveedor_id", nullable = false)
+	private Proveedor proveedor;
+
+	@Column(name = "pais_origen", nullable = false, length = 80)
+	private String paisOrigen;
+
 	@Column(name = "precio_compra", nullable = false, precision = 12, scale = 2)
 	private BigDecimal precioCompra = BigDecimal.ZERO;
 
@@ -67,12 +75,29 @@ public class Producto extends AuditoriaEntity {
 			BigDecimal precioCompra,
 			BigDecimal precioVenta
 	) {
+		this(nombre, sku, descripcion, imagenUrl, categoria, marca, null, "No especificado", precioCompra, precioVenta);
+	}
+
+	public Producto(
+			String nombre,
+			String sku,
+			String descripcion,
+			String imagenUrl,
+			Categoria categoria,
+			Marca marca,
+			Proveedor proveedor,
+			String paisOrigen,
+			BigDecimal precioCompra,
+			BigDecimal precioVenta
+	) {
 		this.nombre = nombre;
 		this.sku = sku;
 		this.descripcion = descripcion;
 		this.imagenUrl = imagenUrl;
 		this.categoria = categoria;
 		this.marca = marca;
+		this.proveedor = proveedor;
+		this.paisOrigen = paisOrigen;
 		this.precioCompra = precioCompra;
 		this.precioVenta = precioVenta;
 		this.estado = EstadoProducto.ACTIVO;
@@ -106,6 +131,14 @@ public class Producto extends AuditoriaEntity {
 		return marca;
 	}
 
+	public Proveedor getProveedor() {
+		return proveedor;
+	}
+
+	public String getPaisOrigen() {
+		return paisOrigen;
+	}
+
 	public BigDecimal getPrecioCompra() {
 		return precioCompra;
 	}
@@ -125,6 +158,8 @@ public class Producto extends AuditoriaEntity {
 			String imagenUrl,
 			Categoria categoria,
 			Marca marca,
+			Proveedor proveedor,
+			String paisOrigen,
 			BigDecimal precioCompra,
 			BigDecimal precioVenta,
 			EstadoProducto estado
@@ -135,6 +170,8 @@ public class Producto extends AuditoriaEntity {
 		this.imagenUrl = imagenUrl;
 		this.categoria = categoria;
 		this.marca = marca;
+		this.proveedor = proveedor;
+		this.paisOrigen = paisOrigen;
 		this.precioCompra = precioCompra;
 		this.precioVenta = precioVenta;
 		this.estado = estado;

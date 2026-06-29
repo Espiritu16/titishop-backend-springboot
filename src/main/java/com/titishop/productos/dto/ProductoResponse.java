@@ -25,6 +25,12 @@ public record ProductoResponse(
 		UUID marcaId,
 		@Schema(description = "Nombre de la marca.", example = "Gloria")
 		String marcaNombre,
+		@Schema(description = "Identificador del proveedor principal.", example = "5a81e2d0-55f8-4a3b-8d65-febec9959002")
+		UUID proveedorId,
+		@Schema(description = "Razon social del proveedor principal.", example = "Distribuidora Lima Norte SAC")
+		String proveedorRazonSocial,
+		@Schema(description = "Pais de origen del producto.", example = "China")
+		String paisOrigen,
 		@Schema(description = "Precio de compra vigente.", example = "3.30")
 		BigDecimal precioCompra,
 		@Schema(description = "Precio de venta vigente.", example = "4.80")

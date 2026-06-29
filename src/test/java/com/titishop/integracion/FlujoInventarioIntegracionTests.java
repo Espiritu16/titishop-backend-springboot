@@ -67,16 +67,6 @@ class FlujoInventarioIntegracionTests {
 		assertThat(passwordEncoder.matches("kevin123", admin.getPasswordHash())).isTrue();
 		var categoria = categoriaService.crear(new CrearCategoriaRequest("Integracion"));
 		var marca = marcaService.crear(new CrearMarcaRequest("Marca Integracion"));
-		ProductoResponse producto = productoService.crear(new CrearProductoRequest(
-				"Producto Integracion",
-				"SKU-INT-001",
-				"Producto para prueba integrada",
-				null,
-				categoria.id(),
-				marca.id(),
-				BigDecimal.valueOf(10),
-				BigDecimal.valueOf(15)
-		));
 		ProveedorResponse proveedor = proveedorService.crear(new CrearProveedorRequest(
 				"Proveedor Integracion",
 				"20609998881",
@@ -84,6 +74,18 @@ class FlujoInventarioIntegracionTests {
 				"014700000",
 				"integracion@proveedor.pe",
 				"Av. Integracion 123"
+		));
+		ProductoResponse producto = productoService.crear(new CrearProductoRequest(
+				"Producto Integracion",
+				"SKU-INT-001",
+				"Producto para prueba integrada",
+				null,
+				categoria.id(),
+				marca.id(),
+				proveedor.id(),
+				"China",
+				BigDecimal.valueOf(10),
+				BigDecimal.valueOf(15)
 		));
 
 		InventarioResponse inventario = inventarioService.crear(new CrearInventarioRequest(

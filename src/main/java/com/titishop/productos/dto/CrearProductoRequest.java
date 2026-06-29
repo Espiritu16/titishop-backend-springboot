@@ -22,6 +22,10 @@ public record CrearProductoRequest(
 		@NotNull UUID categoriaId,
 		@Schema(description = "Identificador de la marca.", example = "1ab2cd34-56ef-7890-ab12-cd34ef567890")
 		@NotNull UUID marcaId,
+		@Schema(description = "Identificador del proveedor principal del producto.", example = "5a81e2d0-55f8-4a3b-8d65-febec9959002")
+		@NotNull UUID proveedorId,
+		@Schema(description = "Pais de origen del producto importado.", example = "China", maxLength = 80)
+		@NotBlank @Size(max = 80) String paisOrigen,
 		@Schema(description = "Precio de compra del producto.", example = "3.20", minimum = "0")
 		@NotNull @DecimalMin(value = "0.0", inclusive = true) BigDecimal precioCompra,
 		@Schema(description = "Precio de venta del producto.", example = "4.50", minimum = "0")

@@ -17,10 +17,15 @@ import com.titishop.productos.exception.MarcaInactivaParaProductoException;
 import com.titishop.productos.exception.MarcaNoEncontradaException;
 import com.titishop.productos.exception.ProductoInvalidoException;
 import com.titishop.productos.exception.ProductoNoEncontradoException;
+import com.titishop.productos.exception.ProveedorInactivoParaProductoException;
 import com.titishop.productos.exception.SkuDuplicadoException;
 import com.titishop.productos.repository.CategoriaRepository;
 import com.titishop.productos.repository.MarcaRepository;
 import com.titishop.productos.repository.ProductoRepository;
+import com.titishop.proveedores.entity.EstadoProveedor;
+import com.titishop.proveedores.entity.Proveedor;
+import com.titishop.proveedores.exception.ProveedorNoEncontradoException;
+import com.titishop.proveedores.repository.ProveedorRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
@@ -39,20 +44,23 @@ public class ProductoService {
 	private final ProductoRepository productoRepository;
 	private final CategoriaRepository categoriaRepository;
 	private final MarcaRepository marcaRepository;
+	private final ProveedorRepository proveedorRepository;
 
 	public ProductoService(
 			ProductoRepository productoRepository,
 			CategoriaRepository categoriaRepository,
-			MarcaRepository marcaRepository
+			MarcaRepository marcaRepository,
+			ProveedorRepository proveedorRepository
 	) {
 		this.productoRepository = productoRepository;
 		this.categoriaRepository = categoriaRepository;
 		this.marcaRepository = marcaRepository;
+		this.proveedorRepository = proveedorRepository;
 	}
 
 	@Transactional(readOnly = true)
 	public List<ProductoResponse> listar() {
-		return listar(0, Integer.MAX_VALUE, null, null, null, null).content();
+		return listar(0, Integer.MAX_VALUE, null, null, null, null, null).content();
 	}
 
 	@Transactional(readOnly = true)
@@ -62,10 +70,11 @@ public class ProductoService {
 			String busqueda,
 			EstadoProducto estado,
 			UUID categoriaId,
-			UUID marcaId
+			UUID marcaId,
+			UUID proveedorId
 	) {
 		var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "creadoEn"));
-		var pagina = productoRepository.findAll(construirFiltro(busqueda, estado, categoriaId, marcaId), pageable)
+		var pagina = productoRepository.findAll(construirFiltro(busqueda, estado, categoriaId, marcaId, proveedorId), pageable)
 				.map(this::toResponse);
 		return new PaginaResponse<>(
 				pagina.getContent(),
@@ -93,6 +102,8 @@ public class ProductoService {
 
 		Categoria categoria = buscarCategoria(request.categoriaId());
 		Marca marca = buscarMarca(request.marcaId());
+		Proveedor proveedor = buscarProveedor(request.proveedorId());
+		String paisOrigen = normalizarPaisOrigen(request.paisOrigen());
 
 		Producto producto = new Producto(
 				request.nombre().trim(),
@@ -101,6 +112,8 @@ public class ProductoService {
 				normalizarImagen(request.imagenUrl()),
 				categoria,
 				marca,
+				proveedor,
+				paisOrigen,
 				request.precioCompra(),
 				request.precioVenta()
 		);
@@ -117,9 +130,11 @@ public class ProductoService {
 
 		Categoria categoria = buscarCategoria(request.categoriaId());
 		Marca marca = buscarMarca(request.marcaId());
+		Proveedor proveedor = buscarProveedor(request.proveedorId());
 		String nombre = request.nombre().trim();
 		String descripcion = request.descripcion().trim();
 		String imagenUrl = normalizarImagen(request.imagenUrl());
+		String paisOrigen = normalizarPaisOrigen(request.paisOrigen());
 		com.titishop.productos.entity.EstadoProducto estado =
 				com.titishop.productos.entity.EstadoProducto.valueOf(request.estado().name());
 
@@ -129,6 +144,8 @@ public class ProductoService {
 				&& Objects.equals(producto.getImagenUrl(), imagenUrl)
 				&& Objects.equals(producto.getCategoria().getId(), categoria.getId())
 				&& Objects.equals(producto.getMarca().getId(), marca.getId())
+				&& Objects.equals(producto.getProveedor().getId(), proveedor.getId())
+				&& Objects.equals(producto.getPaisOrigen(), paisOrigen)
 				&& producto.getPrecioCompra().compareTo(request.precioCompra()) == 0
 				&& producto.getPrecioVenta().compareTo(request.precioVenta()) == 0
 				&& producto.getEstado() == estado) {
@@ -142,6 +159,8 @@ public class ProductoService {
 				imagenUrl,
 				categoria,
 				marca,
+				proveedor,
+				paisOrigen,
 				request.precioCompra(),
 				request.precioVenta(),
 				estado
@@ -167,6 +186,8 @@ public class ProductoService {
 					producto.getImagenUrl(),
 					producto.getCategoria(),
 					producto.getMarca(),
+					producto.getProveedor(),
+					producto.getPaisOrigen(),
 					producto.getPrecioCompra(),
 					producto.getPrecioVenta(),
 					com.titishop.productos.entity.EstadoProducto.ACTIVO
@@ -195,6 +216,15 @@ public class ProductoService {
 				.orElseThrow(() -> new MarcaNoEncontradaException(marcaId));
 		validarMarcaActiva(marca);
 		return marca;
+	}
+
+	private Proveedor buscarProveedor(UUID proveedorId) {
+		Proveedor proveedor = proveedorRepository.findById(proveedorId)
+				.orElseThrow(() -> new ProveedorNoEncontradoException(proveedorId));
+		if (proveedor.getEstado() != EstadoProveedor.ACTIVO) {
+			throw new ProveedorInactivoParaProductoException(proveedorId);
+		}
+		return proveedor;
 	}
 
 	private void validarCategoriaActiva(Categoria categoria) {
@@ -230,11 +260,20 @@ public class ProductoService {
 		return value.isEmpty() ? null : value;
 	}
 
+	private String normalizarPaisOrigen(String paisOrigen) {
+		String value = paisOrigen.trim().replaceAll("\\s+", " ");
+		if (value.isEmpty()) {
+			throw new ProductoInvalidoException("El pais de origen es obligatorio.");
+		}
+		return value;
+	}
+
 	private Specification<Producto> construirFiltro(
 			String busqueda,
 			EstadoProducto estado,
 			UUID categoriaId,
-			UUID marcaId
+			UUID marcaId,
+			UUID proveedorId
 	) {
 		return (root, query, cb) -> {
 			var predicates = cb.conjunction();
@@ -243,11 +282,14 @@ public class ProductoService {
 				String like = "%" + texto + "%";
 				var categoria = root.join("categoria");
 				var marca = root.join("marca");
+				var proveedor = root.join("proveedor");
 				predicates = cb.and(predicates, cb.or(
 						cb.like(cb.lower(root.get("nombre")), like),
 						cb.like(cb.lower(root.get("sku")), like),
+						cb.like(cb.lower(root.get("paisOrigen")), like),
 						cb.like(cb.lower(categoria.get("nombre")), like),
-						cb.like(cb.lower(marca.get("nombre")), like)
+						cb.like(cb.lower(marca.get("nombre")), like),
+						cb.like(cb.lower(proveedor.get("razonSocial")), like)
 				));
 			}
 			if (estado != null) {
@@ -262,6 +304,9 @@ public class ProductoService {
 			if (marcaId != null) {
 				predicates = cb.and(predicates, cb.equal(root.get("marca").get("id"), marcaId));
 			}
+			if (proveedorId != null) {
+				predicates = cb.and(predicates, cb.equal(root.get("proveedor").get("id"), proveedorId));
+			}
 			return predicates;
 		};
 	}
@@ -271,6 +316,7 @@ public class ProductoService {
 	}
 
 	private ProductoResponse toResponse(Producto producto) {
+		Proveedor proveedor = producto.getProveedor();
 		return new ProductoResponse(
 				producto.getId(),
 				producto.getNombre(),
@@ -281,6 +327,9 @@ public class ProductoService {
 				producto.getCategoria().getNombre(),
 				producto.getMarca().getId(),
 				producto.getMarca().getNombre(),
+				proveedor == null ? null : proveedor.getId(),
+				proveedor == null ? null : proveedor.getRazonSocial(),
+				producto.getPaisOrigen(),
 				producto.getPrecioCompra(),
 				producto.getPrecioVenta(),
 				com.titishop.productos.dto.EstadoProducto.valueOf(producto.getEstado().name()),
