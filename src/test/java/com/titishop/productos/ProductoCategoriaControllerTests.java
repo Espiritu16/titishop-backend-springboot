@@ -63,7 +63,7 @@ class ProductoCategoriaControllerTests {
 	@Test
 	void crearProductoRetorna201() throws Exception {
 		CrearProductoRequest request = new CrearProductoRequest(
-				"Mouse", "SKU-1", "Optico", null, UUID.randomUUID(), UUID.randomUUID(), BigDecimal.ONE, BigDecimal.TEN
+				"Mouse", "SKU-1", "Optico", null, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), "China", BigDecimal.ONE, BigDecimal.TEN
 		);
 		ProductoResponse response = new ProductoResponse(
 				UUID.randomUUID(),
@@ -75,6 +75,9 @@ class ProductoCategoriaControllerTests {
 				"Perifericos",
 				request.marcaId(),
 				"Logi",
+				request.proveedorId(),
+				"Proveedor Uno",
+				"China",
 				BigDecimal.ONE,
 				BigDecimal.TEN,
 				EstadoProducto.ACTIVO,
@@ -117,6 +120,8 @@ class ProductoCategoriaControllerTests {
 				  "descripcion": "",
 				  "categoriaId": null,
 				  "marcaId": null,
+				  "proveedorId": null,
+				  "paisOrigen": "",
 				  "precioCompra": -1,
 				  "precioVenta": -2,
 				  "estado": null
@@ -141,6 +146,9 @@ class ProductoCategoriaControllerTests {
 				"Perifericos",
 				UUID.randomUUID(),
 				"Logi",
+				UUID.randomUUID(),
+				"Proveedor Uno",
+				"China",
 				BigDecimal.ONE,
 				BigDecimal.TEN,
 				EstadoProducto.INACTIVO,

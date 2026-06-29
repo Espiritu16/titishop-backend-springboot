@@ -16,4 +16,13 @@ class ProductoEstructuraTests {
 		assertThat(descripcion.getType()).isEqualTo(String.class);
 		assertThat(imagenUrl.getType()).isEqualTo(String.class);
 	}
+
+	@Test
+	void productoIncluyePaisOrigenYProveedor() throws NoSuchFieldException {
+		Field paisOrigen = Producto.class.getDeclaredField("paisOrigen");
+		Field proveedor = Producto.class.getDeclaredField("proveedor");
+
+		assertThat(paisOrigen.getType()).isEqualTo(String.class);
+		assertThat(proveedor.getType().getSimpleName()).isEqualTo("Proveedor");
+	}
 }

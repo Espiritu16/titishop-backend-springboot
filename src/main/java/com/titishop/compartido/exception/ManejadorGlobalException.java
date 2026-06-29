@@ -23,6 +23,7 @@ import com.titishop.productos.exception.NombreCategoriaDuplicadoException;
 import com.titishop.productos.exception.NombreMarcaDuplicadoException;
 import com.titishop.productos.exception.ProductoInvalidoException;
 import com.titishop.productos.exception.ProductoNoEncontradoException;
+import com.titishop.productos.exception.ProveedorInactivoParaProductoException;
 import com.titishop.productos.exception.SkuDuplicadoException;
 import com.titishop.proveedores.exception.EmailProveedorDuplicadoException;
 import com.titishop.proveedores.exception.FactilizaDocumentoNoEncontradoException;
@@ -119,6 +120,7 @@ public class ManejadorGlobalException {
 			MovimientoInvalidoException.class,
 			MovimientoYaAnuladoException.class,
 			ProductoInvalidoException.class,
+			ProveedorInactivoParaProductoException.class,
 			ProveedorInactivoParaEntradaException.class,
 			ProveedorRequeridoParaEntradaException.class,
 			StockInsuficienteException.class

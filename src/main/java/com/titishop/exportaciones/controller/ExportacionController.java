@@ -71,19 +71,22 @@ public class ExportacionController {
 			@RequestParam(required = false) String busqueda,
 			@RequestParam(required = false) EstadoProducto estado,
 			@RequestParam(required = false) UUID categoriaId,
-			@RequestParam(required = false) UUID marcaId
+			@RequestParam(required = false) UUID marcaId,
+			@RequestParam(required = false) UUID proveedorId
 	) {
 		return descargar(exportacionService.exportar(
 				"Productos",
 				"productos",
 				FormatoExportacion.desde(formato),
-				(page, size) -> productoService.listar(page, size, busqueda, estado, categoriaId, marcaId),
+				(page, size) -> productoService.listar(page, size, busqueda, estado, categoriaId, marcaId, proveedorId),
 				List.of(
 						new ColumnaExportacion<>("Nombre", ProductoResponse::nombre),
 						new ColumnaExportacion<>("SKU", ProductoResponse::sku),
 						new ColumnaExportacion<>("Descripcion", ProductoResponse::descripcion),
 						new ColumnaExportacion<>("Categoria", ProductoResponse::categoriaNombre),
 						new ColumnaExportacion<>("Marca", ProductoResponse::marcaNombre),
+						new ColumnaExportacion<>("Proveedor", ProductoResponse::proveedorRazonSocial),
+						new ColumnaExportacion<>("Pais origen", ProductoResponse::paisOrigen),
 						new ColumnaExportacion<>("Precio compra", ProductoResponse::precioCompra),
 						new ColumnaExportacion<>("Precio venta", ProductoResponse::precioVenta),
 						new ColumnaExportacion<>("Estado", ProductoResponse::estado)
@@ -143,13 +146,14 @@ public class ExportacionController {
 			@PathVariable String formato,
 			@RequestParam(required = false) String busqueda,
 			@RequestParam(required = false) TipoMovimiento tipo,
-			@RequestParam(required = false) Boolean anulado
+			@RequestParam(required = false) Boolean anulado,
+			@RequestParam(required = false) UUID productoId
 	) {
 		return descargar(exportacionService.exportar(
 				"Movimientos",
 				"movimientos",
 				FormatoExportacion.desde(formato),
-				(page, size) -> movimientoService.listar(page, size, busqueda, tipo, anulado),
+				(page, size) -> movimientoService.listar(page, size, busqueda, tipo, anulado, productoId),
 				List.of(
 						new ColumnaExportacion<>("Tipo", MovimientoResponse::tipo),
 						new ColumnaExportacion<>("Producto", MovimientoResponse::productoNombre),

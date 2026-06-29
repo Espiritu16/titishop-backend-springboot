@@ -63,7 +63,7 @@ public class MovimientoService {
 
 	@Transactional(readOnly = true)
 	public List<MovimientoResponse> listar() {
-		return listar(0, Integer.MAX_VALUE, null, null, null).content();
+		return listar(0, Integer.MAX_VALUE, null, null, null, null).content();
 	}
 
 	@Transactional(readOnly = true)
@@ -72,10 +72,11 @@ public class MovimientoService {
 			int size,
 			String busqueda,
 			com.titishop.movimientos.dto.TipoMovimiento tipo,
-			Boolean anulado
+			Boolean anulado,
+			UUID productoId
 	) {
 		var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "creadoEn"));
-		var pagina = movimientoRepository.findAll(construirFiltro(busqueda, tipo, anulado), pageable).map(this::toResponse);
+		var pagina = movimientoRepository.findAll(construirFiltro(busqueda, tipo, anulado, productoId), pageable).map(this::toResponse);
 		return new PaginaResponse<>(
 				pagina.getContent(),
 				pagina.getNumber(),
@@ -247,7 +248,8 @@ public class MovimientoService {
 	private Specification<Movimiento> construirFiltro(
 			String busqueda,
 			com.titishop.movimientos.dto.TipoMovimiento tipo,
-			Boolean anulado
+			Boolean anulado,
+			UUID productoId
 	) {
 		return (root, query, cb) -> {
 			var predicates = cb.conjunction();
@@ -273,6 +275,9 @@ public class MovimientoService {
 				predicates = anulado
 						? cb.and(predicates, cb.isNotNull(root.get("anuladoEn")))
 						: cb.and(predicates, cb.isNull(root.get("anuladoEn")));
+			}
+			if (productoId != null) {
+				predicates = cb.and(predicates, cb.equal(root.get("producto").get("id"), productoId));
 			}
 			return predicates;
 		};

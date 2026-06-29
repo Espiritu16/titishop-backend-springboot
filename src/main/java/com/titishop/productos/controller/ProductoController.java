@@ -64,9 +64,10 @@ public class ProductoController {
 			@RequestParam(required = false) String busqueda,
 			@RequestParam(required = false) EstadoProducto estado,
 			@RequestParam(required = false) UUID categoriaId,
-			@RequestParam(required = false) UUID marcaId
+			@RequestParam(required = false) UUID marcaId,
+			@RequestParam(required = false) UUID proveedorId
 	) {
-		return productoService.listar(page, size, busqueda, estado, categoriaId, marcaId);
+		return productoService.listar(page, size, busqueda, estado, categoriaId, marcaId, proveedorId);
 	}
 
 	@GetMapping("/{id}")
@@ -103,6 +104,8 @@ public class ProductoController {
 									  "imagenUrl": "https://cdn.titishop.local/productos/leche-400g.png",
 									  "categoriaId": "0f1e2d3c-4b5a-6789-9012-3456789abcde",
 									  "marcaId": "1ab2cd34-56ef-7890-ab12-cd34ef567890",
+									  "proveedorId": "5a81e2d0-55f8-4a3b-8d65-febec9959002",
+									  "paisOrigen": "China",
 									  "precioCompra": 3.20,
 									  "precioVenta": 4.50
 									}
@@ -147,6 +150,8 @@ public class ProductoController {
 									  "imagenUrl": "https://cdn.titishop.local/productos/leche-410g.png",
 									  "categoriaId": "0f1e2d3c-4b5a-6789-9012-3456789abcde",
 									  "marcaId": "1ab2cd34-56ef-7890-ab12-cd34ef567890",
+									  "proveedorId": "5a81e2d0-55f8-4a3b-8d65-febec9959002",
+									  "paisOrigen": "China",
 									  "precioCompra": 3.30,
 									  "precioVenta": 4.80,
 									  "estado": "ACTIVO"

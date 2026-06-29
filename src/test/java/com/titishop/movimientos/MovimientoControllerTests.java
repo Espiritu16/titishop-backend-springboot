@@ -1,6 +1,7 @@
 package com.titishop.movimientos;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -111,7 +112,7 @@ class MovimientoControllerTests {
 	void listarRetornaMovimientos() throws Exception {
 		UUID productoId = UUID.randomUUID();
 		UUID usuarioId = UUID.randomUUID();
-		when(movimientoService.listar(0, 10, null, null, null)).thenReturn(new PaginaResponse<>(
+		when(movimientoService.listar(0, 10, null, null, null, null)).thenReturn(new PaginaResponse<>(
 				List.of(movimientoResponse(productoId, null, usuarioId, TipoMovimiento.SALIDA)),
 				0,
 				10,
@@ -125,6 +126,26 @@ class MovimientoControllerTests {
 		mockMvc.perform(get("/api/movimientos"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].tipo").value("SALIDA"));
+	}
+
+	@Test
+	void listarAceptaFiltroProductoIdParaHistorial() throws Exception {
+		UUID productoId = UUID.randomUUID();
+		UUID usuarioId = UUID.randomUUID();
+		when(movimientoService.listar(eq(0), eq(10), eq(null), eq(null), eq(null), eq(productoId))).thenReturn(new PaginaResponse<>(
+				List.of(movimientoResponse(productoId, null, usuarioId, TipoMovimiento.ENTRADA)),
+				0,
+				10,
+				1,
+				1,
+				true,
+				true,
+				false
+		));
+
+		mockMvc.perform(get("/api/movimientos").param("productoId", productoId.toString()))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.content[0].productoId").value(productoId.toString()));
 	}
 
 	@Test
