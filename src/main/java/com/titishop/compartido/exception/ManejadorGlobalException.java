@@ -43,6 +43,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -202,6 +203,11 @@ public class ManejadorGlobalException {
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	ResponseEntity<ErrorResponse> manejarCuerpoNoLegible(HttpMessageNotReadableException ex, HttpServletRequest request) {
 		return build(HttpStatus.BAD_REQUEST, "Cuerpo de solicitud invalido.", request, List.of());
+	}
+
+	@ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+	ResponseEntity<ErrorResponse> manejarTipoRespuestaNoAceptable(HttpMediaTypeNotAcceptableException ex, HttpServletRequest request) {
+		return build(HttpStatus.NOT_ACCEPTABLE, "Tipo de respuesta no aceptable para este recurso.", request, List.of());
 	}
 
 	@ExceptionHandler(NoResourceFoundException.class)
