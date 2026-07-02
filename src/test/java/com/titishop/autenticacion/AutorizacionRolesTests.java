@@ -2,6 +2,8 @@ package com.titishop.autenticacion;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -72,6 +74,16 @@ class AutorizacionRolesTests {
 
 		mockMvc.perform(get("/api/usuarios").with(jwtAdministrador()))
 				.andExpect(status().isOk());
+	}
+
+	@Test
+	void corsPermitePatchParaCambiosDeEstadoDesdeFrontend() throws Exception {
+		mockMvc.perform(options("/api/usuarios/00000000-0000-0000-0000-000000000000/estado")
+						.header("Origin", "http://localhost:4200")
+						.header("Access-Control-Request-Method", "PATCH")
+						.header("Access-Control-Request-Headers", "authorization,content-type"))
+				.andExpect(status().isOk())
+				.andExpect(header().string("Access-Control-Allow-Methods", org.hamcrest.Matchers.containsString("PATCH")));
 	}
 
 	private org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor jwtAdministrador() {
