@@ -2,6 +2,12 @@ package com.titishop.autenticacion.controller;
 
 import com.titishop.autenticacion.dto.LoginRequest;
 import com.titishop.autenticacion.dto.LoginResponse;
+import com.titishop.autenticacion.dto.MensajeResponse;
+import com.titishop.autenticacion.dto.RestablecerPasswordRequest;
+import com.titishop.autenticacion.dto.SolicitarRecuperacionPasswordRequest;
+import com.titishop.autenticacion.dto.ValidarCodigoRecuperacionRequest;
+import com.titishop.autenticacion.dto.ValidarCodigoRecuperacionResponse;
+import com.titishop.autenticacion.service.RecuperacionPasswordService;
 import com.titishop.autenticacion.service.AutenticacionService;
 import com.titishop.compartido.response.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,9 +31,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AutenticacionController {
 
 	private final AutenticacionService autenticacionService;
+	private final RecuperacionPasswordService recuperacionPasswordService;
 
-	public AutenticacionController(AutenticacionService autenticacionService) {
+	public AutenticacionController(
+			AutenticacionService autenticacionService,
+			RecuperacionPasswordService recuperacionPasswordService
+	) {
 		this.autenticacionService = autenticacionService;
+		this.recuperacionPasswordService = recuperacionPasswordService;
 	}
 
 	@PostMapping("/login")
@@ -63,5 +74,26 @@ public class AutenticacionController {
 	})
 	public LoginResponse login(@Valid @RequestBody LoginRequest request) {
 		return autenticacionService.login(request);
+	}
+
+	@PostMapping("/recuperacion/solicitar")
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(summary = "Solicitar codigo de recuperacion")
+	public MensajeResponse solicitarRecuperacion(@Valid @RequestBody SolicitarRecuperacionPasswordRequest request) {
+		return recuperacionPasswordService.solicitar(request);
+	}
+
+	@PostMapping("/recuperacion/validar")
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(summary = "Validar codigo de recuperacion")
+	public ValidarCodigoRecuperacionResponse validarCodigo(@Valid @RequestBody ValidarCodigoRecuperacionRequest request) {
+		return recuperacionPasswordService.validar(request);
+	}
+
+	@PostMapping("/recuperacion/restablecer")
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(summary = "Restablecer contrasena")
+	public MensajeResponse restablecerPassword(@Valid @RequestBody RestablecerPasswordRequest request) {
+		return recuperacionPasswordService.restablecer(request);
 	}
 }

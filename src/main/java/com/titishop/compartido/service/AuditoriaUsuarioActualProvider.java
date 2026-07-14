@@ -5,6 +5,7 @@ import com.titishop.usuarios.repository.UsuarioRepository;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,9 @@ public class AuditoriaUsuarioActualProvider {
 
 	public Optional<Usuario> obtener() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || !authentication.isAuthenticated()) {
+		if (authentication == null
+				|| !authentication.isAuthenticated()
+				|| authentication instanceof AnonymousAuthenticationToken) {
 			return Optional.empty();
 		}
 

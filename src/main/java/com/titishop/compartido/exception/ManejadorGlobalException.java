@@ -2,6 +2,7 @@ package com.titishop.compartido.exception;
 
 import com.titishop.archivos.exception.ArchivoInvalidoException;
 import com.titishop.archivos.exception.ArchivoStorageException;
+import com.titishop.autenticacion.exception.RecuperacionPasswordInvalidaException;
 import com.titishop.compartido.response.ErrorResponse;
 import com.titishop.exportaciones.exception.ExportacionSinDatosException;
 import com.titishop.exportaciones.exception.FormatoExportacionInvalidoException;
@@ -39,6 +40,8 @@ import java.util.List;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
@@ -54,6 +57,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class ManejadorGlobalException {
+
+	private static final Logger log = LoggerFactory.getLogger(ManejadorGlobalException.class);
 
 	@ExceptionHandler(UsuarioNoEncontradoException.class)
 	ResponseEntity<ErrorResponse> manejarUsuarioNoEncontrado(UsuarioNoEncontradoException ex, HttpServletRequest request) {
@@ -121,6 +126,7 @@ public class ManejadorGlobalException {
 			MovimientoInvalidoException.class,
 			MovimientoYaAnuladoException.class,
 			ProductoInvalidoException.class,
+			RecuperacionPasswordInvalidaException.class,
 			ProveedorInactivoParaProductoException.class,
 			ProveedorInactivoParaEntradaException.class,
 			ProveedorRequeridoParaEntradaException.class,
@@ -217,6 +223,7 @@ public class ManejadorGlobalException {
 
 	@ExceptionHandler(Exception.class)
 	ResponseEntity<ErrorResponse> manejarGenerico(Exception ex, HttpServletRequest request) {
+		log.error("Error interno no controlado en {} {}", request.getMethod(), request.getRequestURI(), ex);
 		return build(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor.", request, List.of());
 	}
 
