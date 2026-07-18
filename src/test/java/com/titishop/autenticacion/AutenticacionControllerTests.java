@@ -42,13 +42,13 @@ class AutenticacionControllerTests {
 
 	@Test
 	void solicitarRecuperacionRetornaMensajeGenerico() throws Exception {
-		when(recuperacionPasswordService.solicitar(any())).thenReturn(new MensajeResponse("Si el correo existe, se envio un codigo de recuperacion."));
+		when(recuperacionPasswordService.solicitar(any())).thenReturn(new MensajeResponse("Si el correo existe, se envió un código de recuperación."));
 
 		mockMvc.perform(post("/api/autenticacion/recuperacion/solicitar")
 						.contentType("application/json")
 						.content("{\"email\":\"admin@titishop.pe\"}"))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.mensaje").value("Si el correo existe, se envio un codigo de recuperacion."));
+				.andExpect(jsonPath("$.mensaje").value("Si el correo existe, se envió un código de recuperación."));
 	}
 
 	@Test
@@ -64,12 +64,12 @@ class AutenticacionControllerTests {
 
 	@Test
 	void restablecerPasswordRetornaMensaje() throws Exception {
-		when(recuperacionPasswordService.restablecer(any())).thenReturn(new MensajeResponse("Contrasena actualizada correctamente."));
+		when(recuperacionPasswordService.restablecer(any())).thenReturn(new MensajeResponse("Contraseña actualizada correctamente."));
 
 		mockMvc.perform(post("/api/autenticacion/recuperacion/restablecer")
 						.contentType("application/json")
 						.content("{\"email\":\"admin@titishop.pe\",\"resetToken\":\"reset-token\",\"nuevaPassword\":\"NuevaClave123\"}"))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.mensaje").value("Contrasena actualizada correctamente."));
+				.andExpect(jsonPath("$.mensaje").value("Contraseña actualizada correctamente."));
 	}
 }

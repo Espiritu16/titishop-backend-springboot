@@ -86,7 +86,7 @@ public class ExportacionController {
 						new ColumnaExportacion<>("Categoria", ProductoResponse::categoriaNombre),
 						new ColumnaExportacion<>("Marca", ProductoResponse::marcaNombre),
 						new ColumnaExportacion<>("Proveedor", ProductoResponse::proveedorRazonSocial),
-						new ColumnaExportacion<>("Pais origen", ProductoResponse::paisOrigen),
+						new ColumnaExportacion<>("País origen", ProductoResponse::paisOrigen),
 						new ColumnaExportacion<>("Precio compra", ProductoResponse::precioCompra),
 						new ColumnaExportacion<>("Precio venta", ProductoResponse::precioVenta),
 						new ColumnaExportacion<>("Estado", ProductoResponse::estado)
@@ -106,7 +106,7 @@ public class ExportacionController {
 				FormatoExportacion.desde(formato),
 				(page, size) -> proveedorService.listar(page, size, busqueda, estado),
 				List.of(
-						new ColumnaExportacion<>("Razon social", ProveedorResponse::razonSocial),
+						new ColumnaExportacion<>("Razón social", ProveedorResponse::razonSocial),
 						new ColumnaExportacion<>("RUC", ProveedorResponse::ruc),
 						new ColumnaExportacion<>("Celular", ProveedorResponse::celular),
 						new ColumnaExportacion<>("Telefono", ProveedorResponse::telefono),

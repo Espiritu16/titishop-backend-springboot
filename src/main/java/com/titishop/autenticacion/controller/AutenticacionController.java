@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/autenticacion")
-@Tag(name = "Autenticacion", description = "Endpoints publicos para iniciar sesion y obtener JWT.")
+@Tag(name = "Autenticación", description = "Endpoints públicos para iniciar sesión y obtener JWT.")
 public class AutenticacionController {
 
 	private final AutenticacionService autenticacionService;
@@ -44,8 +44,8 @@ public class AutenticacionController {
 	@PostMapping("/login")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(
-			summary = "Iniciar sesion",
-			description = "Autentica un usuario con correo y contrasena, y devuelve un token JWT para consumir endpoints protegidos."
+			summary = "Iniciar sesión",
+			description = "Autentica un usuario con correo y contraseña, y devuelve un token JWT para consumir endpoints protegidos."
 	)
 	@io.swagger.v3.oas.annotations.parameters.RequestBody(
 			required = true,
@@ -66,7 +66,7 @@ public class AutenticacionController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Login exitoso.",
 					content = @Content(schema = @Schema(implementation = LoginResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Credenciales con formato invalido.",
+			@ApiResponse(responseCode = "400", description = "Credenciales con formato inválido.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "401", description = "Credenciales incorrectas."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
@@ -78,21 +78,21 @@ public class AutenticacionController {
 
 	@PostMapping("/recuperacion/solicitar")
 	@ResponseStatus(HttpStatus.OK)
-	@Operation(summary = "Solicitar codigo de recuperacion")
+	@Operation(summary = "Solicitar código de recuperación")
 	public MensajeResponse solicitarRecuperacion(@Valid @RequestBody SolicitarRecuperacionPasswordRequest request) {
 		return recuperacionPasswordService.solicitar(request);
 	}
 
 	@PostMapping("/recuperacion/validar")
 	@ResponseStatus(HttpStatus.OK)
-	@Operation(summary = "Validar codigo de recuperacion")
+	@Operation(summary = "Validar código de recuperación")
 	public ValidarCodigoRecuperacionResponse validarCodigo(@Valid @RequestBody ValidarCodigoRecuperacionRequest request) {
 		return recuperacionPasswordService.validar(request);
 	}
 
 	@PostMapping("/recuperacion/restablecer")
 	@ResponseStatus(HttpStatus.OK)
-	@Operation(summary = "Restablecer contrasena")
+	@Operation(summary = "Restablecer contraseña")
 	public MensajeResponse restablecerPassword(@Valid @RequestBody RestablecerPasswordRequest request) {
 		return recuperacionPasswordService.restablecer(request);
 	}

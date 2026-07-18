@@ -25,8 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RecuperacionPasswordService {
 
-	private static final String MENSAJE_SOLICITUD = "Si el correo existe, se envio un codigo de recuperacion.";
-	private static final String MENSAJE_RESTABLECIDO = "Contrasena actualizada correctamente.";
+	private static final String MENSAJE_SOLICITUD = "Si el correo existe, se envió un código de recuperación.";
+	private static final String MENSAJE_RESTABLECIDO = "Contraseña actualizada correctamente.";
 
 	private final UsuarioRepository usuarioRepository;
 	private final PasswordResetCodeRepository resetCodeRepository;

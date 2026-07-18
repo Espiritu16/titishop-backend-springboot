@@ -156,7 +156,7 @@ public class ManejadorGlobalException {
 		List<String> details = ex.getBindingResult().getFieldErrors().stream()
 				.map(this::formatearErrorCampo)
 				.toList();
-		return build(HttpStatus.BAD_REQUEST, "Error de validacion.", request, details);
+		return build(HttpStatus.BAD_REQUEST, "Error de validación.", request, details);
 	}
 
 	@ExceptionHandler(ConstraintViolationException.class)
@@ -164,29 +164,29 @@ public class ManejadorGlobalException {
 		List<String> details = ex.getConstraintViolations().stream()
 				.map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
 				.toList();
-		return build(HttpStatus.BAD_REQUEST, "Parametro de solicitud invalido.", request, details);
+		return build(HttpStatus.BAD_REQUEST, "Parámetro de solicitud inválido.", request, details);
 	}
 
 	@ExceptionHandler(AuthenticationException.class)
 	ResponseEntity<ErrorResponse> manejarErrorAutenticacion(AuthenticationException ex, HttpServletRequest request) {
-		return build(HttpStatus.UNAUTHORIZED, "Usuario o contrasena incorrectos.", request, List.of());
+		return build(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos.", request, List.of());
 	}
 
 	@ExceptionHandler(AccessDeniedException.class)
 	ResponseEntity<ErrorResponse> manejarAccesoDenegado(AccessDeniedException ex, HttpServletRequest request) {
-		return build(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta accion.", request, List.of());
+		return build(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta acción.", request, List.of());
 	}
 
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	ResponseEntity<ErrorResponse> manejarParametroTipoInvalido(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
-		String detail = ex.getName() + ": valor invalido.";
-		return build(HttpStatus.BAD_REQUEST, "Parametro de solicitud invalido.", request, List.of(detail));
+		String detail = ex.getName() + ": valor inválido.";
+		return build(HttpStatus.BAD_REQUEST, "Parámetro de solicitud inválido.", request, List.of(detail));
 	}
 
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	ResponseEntity<ErrorResponse> manejarParametroFaltante(MissingServletRequestParameterException ex, HttpServletRequest request) {
-		String detail = ex.getParameterName() + ": parametro requerido.";
-		return build(HttpStatus.BAD_REQUEST, "Parametro de solicitud invalido.", request, List.of(detail));
+		String detail = ex.getParameterName() + ": parámetro requerido.";
+		return build(HttpStatus.BAD_REQUEST, "Parámetro de solicitud inválido.", request, List.of(detail));
 	}
 
 	@ExceptionHandler(MissingServletRequestPartException.class)
@@ -197,18 +197,18 @@ public class ManejadorGlobalException {
 
 	@ExceptionHandler(MaxUploadSizeExceededException.class)
 	ResponseEntity<ErrorResponse> manejarArchivoExcesivo(MaxUploadSizeExceededException ex, HttpServletRequest request) {
-		return build(HttpStatus.UNPROCESSABLE_ENTITY, "La imagen supera el tamano maximo permitido.", request, List.of());
+		return build(HttpStatus.UNPROCESSABLE_ENTITY, "La imagen supera el tamaño máximo permitido.", request, List.of());
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
 	ResponseEntity<ErrorResponse> manejarArgumentoInvalido(IllegalArgumentException ex, HttpServletRequest request) {
 		List<String> details = ex.getMessage() == null || ex.getMessage().isBlank() ? List.of() : List.of(ex.getMessage());
-		return build(HttpStatus.BAD_REQUEST, "Parametro de solicitud invalido.", request, details);
+		return build(HttpStatus.BAD_REQUEST, "Parámetro de solicitud inválido.", request, details);
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	ResponseEntity<ErrorResponse> manejarCuerpoNoLegible(HttpMessageNotReadableException ex, HttpServletRequest request) {
-		return build(HttpStatus.BAD_REQUEST, "Cuerpo de solicitud invalido.", request, List.of());
+		return build(HttpStatus.BAD_REQUEST, "Cuerpo de solicitud inválido.", request, List.of());
 	}
 
 	@ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
@@ -228,7 +228,7 @@ public class ManejadorGlobalException {
 	}
 
 	private String formatearErrorCampo(FieldError fieldError) {
-		String message = fieldError.getDefaultMessage() == null ? "valor invalido" : fieldError.getDefaultMessage();
+		String message = fieldError.getDefaultMessage() == null ? "valor inválido" : fieldError.getDefaultMessage();
 		return fieldError.getField() + ": " + message;
 	}
 

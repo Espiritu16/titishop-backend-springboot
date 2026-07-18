@@ -98,7 +98,7 @@ public class SeguridadConfig {
 				objectMapper,
 				HttpServletResponse.SC_UNAUTHORIZED,
 				"Unauthorized",
-				"Debes iniciar sesion para acceder a este recurso.",
+				"Debes iniciar sesión para acceder a este recurso.",
 				request.getRequestURI()
 		);
 	}
@@ -109,7 +109,7 @@ public class SeguridadConfig {
 				objectMapper,
 				HttpServletResponse.SC_FORBIDDEN,
 				"Forbidden",
-				"No tienes permisos para realizar esta accion.",
+				"No tienes permisos para realizar esta acción.",
 				request.getRequestURI()
 		);
 	}

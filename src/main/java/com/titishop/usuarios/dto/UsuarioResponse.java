@@ -18,9 +18,9 @@ public record UsuarioResponse(
 		RolUsuario rol,
 		@Schema(description = "Estado del usuario.", example = "ACTIVO")
 		EstadoUsuario estado,
-		@Schema(description = "Fecha de creacion.", example = "2026-06-01T10:15:30Z")
+		@Schema(description = "Fecha de creación.", example = "2026-06-01T10:15:30Z")
 		Instant creadoEn,
-		@Schema(description = "Fecha de ultima actualizacion.", example = "2026-06-02T14:45:00Z")
+		@Schema(description = "Fecha de última actualización.", example = "2026-06-02T14:45:00Z")
 		Instant actualizadoEn
 ) {
 }

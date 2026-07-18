@@ -18,15 +18,15 @@ public record InventarioResponse(
 		Integer stockActual,
 		@Schema(description = "Stock minimo configurado.", example = "18")
 		Integer stockMinimo,
-		@Schema(description = "Ubicacion en almacen.", example = "A1-RACK-04")
+		@Schema(description = "Ubicación en almacén.", example = "A1-RACK-04")
 		String ubicacion,
 		@Schema(description = "Estado del inventario.", example = "ACTIVO")
 		EstadoInventario estado,
 		@Schema(description = "Indica si el producto ya se encuentra en nivel critico.", example = "false")
 		boolean stockCritico,
-		@Schema(description = "Fecha de creacion.", example = "2026-06-01T08:30:00Z")
+		@Schema(description = "Fecha de creación.", example = "2026-06-01T08:30:00Z")
 		Instant creadoEn,
-		@Schema(description = "Fecha de actualizacion.", example = "2026-06-02T16:20:00Z")
+		@Schema(description = "Fecha de actualización.", example = "2026-06-02T16:20:00Z")
 		Instant actualizadoEn
 ) {
 }

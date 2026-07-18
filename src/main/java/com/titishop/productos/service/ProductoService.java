@@ -263,7 +263,7 @@ public class ProductoService {
 	private String normalizarPaisOrigen(String paisOrigen) {
 		String value = paisOrigen.trim().replaceAll("\\s+", " ");
 		if (value.isEmpty()) {
-			throw new ProductoInvalidoException("El pais de origen es obligatorio.");
+			throw new ProductoInvalidoException("El país de origen es obligatorio.");
 		}
 		return value;
 	}

@@ -17,7 +17,7 @@ public record ReporteStockCriticoResponse(
 		Integer stockMinimo,
 		@Schema(description = "Cantidad sugerida para reposicion.", example = "10")
 		Integer cantidadSugerida,
-		@Schema(description = "Ubicacion del inventario.", example = "A1-RACK-04")
+		@Schema(description = "Ubicación del inventario.", example = "A1-RACK-04")
 		String ubicacion
 ) {
 }

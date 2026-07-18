@@ -13,7 +13,7 @@ public record CrearUsuarioRequest(
 		@NotBlank @Size(max = 120) String nombreCompleto,
 		@Schema(description = "Correo unico del usuario.", example = "kevin@titishop.com", maxLength = 160)
 		@NotBlank @Email @Size(max = 160) String email,
-		@Schema(description = "Contrasena inicial del usuario.", example = "Supervisor123*", minLength = 8, maxLength = 120)
+		@Schema(description = "Contraseña inicial del usuario.", example = "Supervisor123*", minLength = 8, maxLength = 120)
 		@NotBlank @Size(min = 8, max = 120) String password,
 		@Schema(description = "Rol operativo del usuario.", example = "SUPERVISOR")
 		@NotNull RolUsuario rol

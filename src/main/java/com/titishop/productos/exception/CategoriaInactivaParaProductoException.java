@@ -5,6 +5,6 @@ import java.util.UUID;
 public class CategoriaInactivaParaProductoException extends RuntimeException {
 
 	public CategoriaInactivaParaProductoException(UUID categoriaId) {
-		super("La categoria no esta activa para productos: " + categoriaId);
+		super("La categoría no está activa para productos: " + categoriaId);
 	}
 }

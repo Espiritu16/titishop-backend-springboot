@@ -12,9 +12,9 @@ public record ReporteStockResponse(
 		String productoNombre,
 		@Schema(description = "SKU del producto.", example = "LEC-410-001")
 		String productoSku,
-		@Schema(description = "Identificador de categoria.", example = "0f1e2d3c-4b5a-6789-9012-3456789abcde")
+		@Schema(description = "Identificador de categoría.", example = "0f1e2d3c-4b5a-6789-9012-3456789abcde")
 		UUID categoriaId,
-		@Schema(description = "Nombre de la categoria.", example = "Lacteos")
+		@Schema(description = "Nombre de la categoría.", example = "Lacteos")
 		String categoriaNombre,
 		@Schema(description = "Identificador de la marca.", example = "1ab2cd34-56ef-7890-ab12-cd34ef567890")
 		UUID marcaId,
@@ -24,7 +24,7 @@ public record ReporteStockResponse(
 		Integer stockActual,
 		@Schema(description = "Stock minimo configurado.", example = "18")
 		Integer stockMinimo,
-		@Schema(description = "Ubicacion del inventario.", example = "A1-RACK-04")
+		@Schema(description = "Ubicación del inventario.", example = "A1-RACK-04")
 		String ubicacion,
 		@Schema(description = "Estado del inventario.", example = "ACTIVO")
 		EstadoInventario estado,

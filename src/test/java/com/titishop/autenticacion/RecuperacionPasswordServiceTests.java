@@ -80,8 +80,9 @@ class RecuperacionPasswordServiceTests {
 		when(passwordEncoder.encode("123456")).thenReturn("hash-codigo");
 		when(resetCodeRepository.save(any(PasswordResetCode.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		service.solicitar(new SolicitarRecuperacionPasswordRequest(" ADMIN@TITISHOP.PE "));
+		var response = service.solicitar(new SolicitarRecuperacionPasswordRequest(" ADMIN@TITISHOP.PE "));
 
+		assertThat(response.mensaje()).isEqualTo("Si el correo existe, se envió un código de recuperación.");
 		ArgumentCaptor<PasswordResetCode> captor = ArgumentCaptor.forClass(PasswordResetCode.class);
 		verify(resetCodeRepository).save(captor.capture());
 		assertThat(captor.getValue().getCodigoHash()).isEqualTo("hash-codigo");
@@ -117,8 +118,9 @@ class RecuperacionPasswordServiceTests {
 		when(passwordEncoder.matches("reset-token-plano", "hash-token")).thenReturn(true);
 		when(passwordEncoder.encode("NuevaClave123")).thenReturn("hash-nuevo");
 
-		service.restablecer(new RestablecerPasswordRequest("admin@titishop.pe", "reset-token-plano", "NuevaClave123"));
+		var response = service.restablecer(new RestablecerPasswordRequest("admin@titishop.pe", "reset-token-plano", "NuevaClave123"));
 
+		assertThat(response.mensaje()).isEqualTo("Contraseña actualizada correctamente.");
 		assertThat(usuario.getPasswordHash()).isEqualTo("hash-nuevo");
 		assertThat(resetCode.getUsadoEn()).isEqualTo(clock.instant());
 		verify(resetCodeRepository).save(resetCode);

@@ -19,7 +19,7 @@ public record ReporteMovimientosResponse(
 		String productoSku,
 		@Schema(description = "Proveedor vinculado.", example = "5a81e2d0-55f8-4a3b-8d65-febec9959002", nullable = true)
 		UUID proveedorId,
-		@Schema(description = "Razon social del proveedor.", example = "Distribuidora Lima Norte SAC", nullable = true)
+		@Schema(description = "Razón social del proveedor.", example = "Distribuidora Lima Norte SAC", nullable = true)
 		String proveedorRazonSocial,
 		@Schema(description = "Tipo de movimiento.", example = "ENTRADA")
 		TipoMovimiento tipo,

@@ -142,7 +142,7 @@ public class ExportacionService {
 				lineas.add("0 g");
 			}
 			lineas.add("0 g");
-			lineas.add(textoPdf("Pagina " + (paginas.size() + 1), 748, 28, 8));
+			lineas.add(textoPdf("Página " + (paginas.size() + 1), 748, 28, 8));
 			paginas.add(String.join("\n", lineas));
 		}
 		return paginas;

@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 public record LoginRequest(
 		@Schema(description = "Correo del usuario registrado.", example = "kevin@gmail.com")
 		@NotBlank @Email String email,
-		@Schema(description = "Contrasena del usuario.", example = "kevin123")
+		@Schema(description = "Contraseña del usuario.", example = "kevin123")
 		@NotBlank String password
 ) {
 }

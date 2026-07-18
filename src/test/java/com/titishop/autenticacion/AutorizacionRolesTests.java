@@ -30,7 +30,7 @@ class AutorizacionRolesTests {
 	void productosRequiereAdministradorOAlmacenero() throws Exception {
 		mockMvc.perform(get("/api/productos").with(jwtSupervisor()))
 				.andExpect(status().isForbidden())
-				.andExpect(jsonPath("$.message").value("No tienes permisos para realizar esta accion."))
+				.andExpect(jsonPath("$.message").value("No tienes permisos para realizar esta acción."))
 				.andExpect(jsonPath("$.path").value("/api/productos"));
 
 		mockMvc.perform(get("/api/productos").with(jwtAlmacenero()))
@@ -41,7 +41,7 @@ class AutorizacionRolesTests {
 	void endpointProtegidoSinTokenRetornaErrorEstandar() throws Exception {
 		mockMvc.perform(get("/api/productos"))
 				.andExpect(status().isUnauthorized())
-				.andExpect(jsonPath("$.message").value("Debes iniciar sesion para acceder a este recurso."))
+				.andExpect(jsonPath("$.message").value("Debes iniciar sesión para acceder a este recurso."))
 				.andExpect(jsonPath("$.path").value("/api/productos"));
 	}
 

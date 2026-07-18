@@ -31,7 +31,7 @@ public class PanelController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Resumen obtenido correctamente.",
 					content = @Content(schema = @Schema(implementation = PanelResumenResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
