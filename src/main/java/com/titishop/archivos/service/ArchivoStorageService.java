@@ -54,7 +54,7 @@ public class ArchivoStorageService {
 		Path destino = directorioDestino.resolve(nombreArchivo).normalize();
 
 		if (!destino.startsWith(directorioDestino)) {
-			throw new ArchivoInvalidoException("Nombre de archivo invalido.");
+			throw new ArchivoInvalidoException("Nombre de archivo inválido.");
 		}
 
 		try (InputStream inputStream = archivo.getInputStream()) {
@@ -79,11 +79,11 @@ public class ArchivoStorageService {
 			throw new ArchivoInvalidoException("Debe enviar una imagen.");
 		}
 		if (archivo.getSize() > properties.maxFileSize().toBytes()) {
-			throw new ArchivoInvalidoException("La imagen supera el tamano maximo permitido.");
+			throw new ArchivoInvalidoException("La imagen supera el tamaño máximo permitido.");
 		}
 		String contentType = normalizarContentType(archivo.getContentType());
 		if (!EXTENSIONES_PERMITIDAS.containsKey(contentType)) {
-			throw new ArchivoInvalidoException("Solo se permiten imagenes JPG, PNG, WEBP o GIF.");
+			throw new ArchivoInvalidoException("Solo se permiten imágenes JPG, PNG, WEBP o GIF.");
 		}
 	}
 

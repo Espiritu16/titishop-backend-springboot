@@ -36,7 +36,7 @@ public class AutenticacionService {
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.password()));
 
 		Usuario usuario = usuarioRepository.findByEmailIgnoreCase(email)
-				.orElseThrow(() -> new BadCredentialsException("Usuario o contrasena incorrectos."));
+				.orElseThrow(() -> new BadCredentialsException("Usuario o contraseña incorrectos."));
 		Instant emitidoEn = Instant.now();
 		String rol = usuario.getRol().name();
 		String token = jwtService.generarToken(usuario.getId(), usuario.getEmail(), usuario.getNombreCompleto(), rol, emitidoEn);

@@ -53,7 +53,7 @@ public class InventarioController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Listado obtenido correctamente.",
 					content = @Content(schema = @Schema(implementation = PaginaResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -73,7 +73,7 @@ public class InventarioController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Inventario encontrado.",
 					content = @Content(schema = @Schema(implementation = InventarioResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Inventario no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -108,9 +108,9 @@ public class InventarioController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "201", description = "Inventario creado correctamente.",
 					content = @Content(schema = @Schema(implementation = InventarioResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Producto no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -126,7 +126,7 @@ public class InventarioController {
 	}
 
 	@PutMapping("/{id}")
-	@Operation(summary = "Actualizar inventario", description = "Actualiza configuracion operativa y estado de un inventario.")
+	@Operation(summary = "Actualizar inventario", description = "Actualiza configuración operativa y estado de un inventario.")
 	@io.swagger.v3.oas.annotations.parameters.RequestBody(
 			required = true,
 			description = "Datos actualizados del inventario.",
@@ -147,9 +147,9 @@ public class InventarioController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Inventario actualizado correctamente.",
 					content = @Content(schema = @Schema(implementation = InventarioResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Inventario no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -171,9 +171,9 @@ public class InventarioController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Estado actualizado correctamente.",
 					content = @Content(schema = @Schema(implementation = InventarioResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Inventario no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -193,7 +193,7 @@ public class InventarioController {
 	@Operation(summary = "Inactivar inventario", description = "Marca un inventario como inactivo sin eliminarlo.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "204", description = "Inventario inactivado correctamente."),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Inventario no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),

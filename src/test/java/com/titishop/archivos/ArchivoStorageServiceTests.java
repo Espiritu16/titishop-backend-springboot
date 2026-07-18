@@ -49,7 +49,7 @@ class ArchivoStorageServiceTests {
 
 		assertThatThrownBy(() -> service.guardarImagenProducto(archivo))
 				.isInstanceOf(ArchivoInvalidoException.class)
-				.hasMessageContaining("Solo se permiten imagenes");
+				.hasMessageContaining("Solo se permiten imágenes");
 	}
 
 	private ArchivoStorageService crearService() {

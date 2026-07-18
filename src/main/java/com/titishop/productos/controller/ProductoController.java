@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Validated
 @RequestMapping("/api/productos")
-@Tag(name = "Productos", description = "Gestion de productos del catalogo.")
+@Tag(name = "Productos", description = "Gestión de productos del catálogo.")
 @SecurityRequirement(name = "bearerAuth")
 public class ProductoController {
 
@@ -49,11 +49,11 @@ public class ProductoController {
 	}
 
 	@GetMapping
-	@Operation(summary = "Listar productos", description = "Obtiene todos los productos registrados con sus referencias de categoria y marca.")
+	@Operation(summary = "Listar productos", description = "Obtiene todos los productos registrados con sus referencias de categoría y marca.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Listado obtenido correctamente.",
 					content = @Content(schema = @Schema(implementation = PaginaResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -75,7 +75,7 @@ public class ProductoController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Producto encontrado.",
 					content = @Content(schema = @Schema(implementation = ProductoResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Producto no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -88,7 +88,7 @@ public class ProductoController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	@Operation(summary = "Crear producto", description = "Registra un nuevo producto en el catalogo.")
+	@Operation(summary = "Crear producto", description = "Registra un nuevo producto en el catálogo.")
 	@io.swagger.v3.oas.annotations.parameters.RequestBody(
 			required = true,
 			description = "Datos del producto a registrar.",
@@ -116,15 +116,15 @@ public class ProductoController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "201", description = "Producto creado correctamente.",
 					content = @Content(schema = @Schema(implementation = ProductoResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
-			@ApiResponse(responseCode = "404", description = "Categoria o marca no encontrada.",
+			@ApiResponse(responseCode = "404", description = "Categoría o marca no encontrada.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "409", description = "Ya existe un producto con el SKU enviado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "422", description = "Categoria o marca inactiva para el producto.",
+			@ApiResponse(responseCode = "422", description = "Categoría o marca inactiva para el producto.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -134,7 +134,7 @@ public class ProductoController {
 	}
 
 	@PutMapping("/{id}")
-	@Operation(summary = "Actualizar producto", description = "Actualiza la informacion comercial de un producto existente.")
+	@Operation(summary = "Actualizar producto", description = "Actualiza la información comercial de un producto existente.")
 	@io.swagger.v3.oas.annotations.parameters.RequestBody(
 			required = true,
 			description = "Datos actualizados del producto.",
@@ -163,15 +163,15 @@ public class ProductoController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Producto actualizado correctamente.",
 					content = @Content(schema = @Schema(implementation = ProductoResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
-			@ApiResponse(responseCode = "404", description = "Producto, categoria o marca no encontrada.",
+			@ApiResponse(responseCode = "404", description = "Producto, categoría o marca no encontrada.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "409", description = "Ya existe un producto con el SKU enviado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "422", description = "Categoria o marca inactiva para el producto.",
+			@ApiResponse(responseCode = "422", description = "Categoría o marca inactiva para el producto.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -189,13 +189,13 @@ public class ProductoController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Estado actualizado correctamente.",
 					content = @Content(schema = @Schema(implementation = ProductoResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Producto no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "422", description = "Categoria o marca inactiva para activar el producto.",
+			@ApiResponse(responseCode = "422", description = "Categoría o marca inactiva para activar el producto.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 	})
 	public ProductoResponse actualizarEstado(
@@ -211,7 +211,7 @@ public class ProductoController {
 	@Operation(summary = "Inactivar producto", description = "Marca un producto como inactivo sin eliminarlo.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "204", description = "Producto inactivado correctamente."),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Producto no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),

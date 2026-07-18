@@ -15,7 +15,7 @@ public record CrearInventarioRequest(
 		@NotNull @Min(0) Integer stockActual,
 		@Schema(description = "Stock minimo permitido antes de alerta.", example = "20", minimum = "0")
 		@NotNull @Min(0) Integer stockMinimo,
-		@Schema(description = "Ubicacion fisica en almacen.", example = "A1-RACK-03", maxLength = 40)
+		@Schema(description = "Ubicación física en almacén.", example = "A1-RACK-03", maxLength = 40)
 		@NotBlank @Size(max = 40) String ubicacion
 ) {
 }

@@ -28,7 +28,7 @@ public class OpenApiConfig {
 						.description("Servidor publico de TitiShop")))
 				.info(new Info()
 						.title("TitiShop API")
-						.description("API REST para gestionar autenticacion, usuarios, catalogo, proveedores, inventario, movimientos y reportes de TitiShop.")
+						.description("API REST para gestionar autenticación, usuarios, catálogo, proveedores, inventario, movimientos y reportes de TitiShop.")
 						.version("v1")
 						.contact(new Contact()
 								.name("Equipo TitiShop")

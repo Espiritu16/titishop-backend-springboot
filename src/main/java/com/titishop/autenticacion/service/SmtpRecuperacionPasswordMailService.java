@@ -24,13 +24,13 @@ public class SmtpRecuperacionPasswordMailService implements RecuperacionPassword
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setFrom(from);
 		message.setTo(email);
-		message.setSubject("Codigo de recuperacion de TitiShop");
+		message.setSubject("Código de recuperación de TitiShop");
 		message.setText("""
 				Hola %s,
 
-				Tu codigo para recuperar la contrasena de TitiShop es: %s
+				Tu código para recuperar la contraseña de TitiShop es: %s
 
-				Este codigo vence en 10 minutos. Si no solicitaste este cambio, ignora este correo.
+				Este código vence en 10 minutos. Si no solicitaste este cambio, ignora este correo.
 				""".formatted(nombreCompleto, codigo));
 		mailSender.send(message);
 	}

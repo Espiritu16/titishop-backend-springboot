@@ -49,7 +49,7 @@ public class MovimientoController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Listado obtenido correctamente.",
 					content = @Content(schema = @Schema(implementation = PaginaResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -70,7 +70,7 @@ public class MovimientoController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Movimiento encontrado.",
 					content = @Content(schema = @Schema(implementation = MovimientoResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Movimiento no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -124,9 +124,9 @@ public class MovimientoController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "201", description = "Movimiento registrado correctamente.",
 					content = @Content(schema = @Schema(implementation = MovimientoResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Producto, proveedor o usuario no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -160,9 +160,9 @@ public class MovimientoController {
 	)
 	@ApiResponses({
 			@ApiResponse(responseCode = "204", description = "Movimiento anulado correctamente."),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Movimiento o usuario no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),

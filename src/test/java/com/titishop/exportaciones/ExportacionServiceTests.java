@@ -81,7 +81,7 @@ class ExportacionServiceTests {
 	void rechazaFormatoInvalido() {
 		assertThatThrownBy(() -> FormatoExportacion.desde("word"))
 				.isInstanceOf(FormatoExportacionInvalidoException.class)
-				.hasMessage("Formato de exportacion invalido. Use excel o pdf.");
+				.hasMessage("Formato de exportación inválido. Use Excel o PDF.");
 	}
 
 	private static PaginaResponse<ProductoFila> pagina(List<ProductoFila> content, int page, boolean last) {

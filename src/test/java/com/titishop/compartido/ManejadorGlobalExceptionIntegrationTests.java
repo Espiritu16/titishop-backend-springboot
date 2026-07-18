@@ -40,7 +40,7 @@ class ManejadorGlobalExceptionIntegrationTests {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(body))
 				.andExpect(status().isUnauthorized())
-				.andExpect(jsonPath("$.message").value("Usuario o contrasena incorrectos."));
+				.andExpect(jsonPath("$.message").value("Usuario o contraseña incorrectos."));
 	}
 
 	@Test
@@ -56,7 +56,7 @@ class ManejadorGlobalExceptionIntegrationTests {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(body))
 				.andExpect(status().isUnauthorized())
-				.andExpect(jsonPath("$.message").value("Usuario o contrasena incorrectos."));
+				.andExpect(jsonPath("$.message").value("Usuario o contraseña incorrectos."));
 	}
 
 	@Test
@@ -65,7 +65,7 @@ class ManejadorGlobalExceptionIntegrationTests {
 						.param("size", "0")
 						.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ALMACENERO"))))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("Parametro de solicitud invalido."));
+				.andExpect(jsonPath("$.message").value("Parámetro de solicitud inválido."));
 	}
 
 	@Test
@@ -74,7 +74,7 @@ class ManejadorGlobalExceptionIntegrationTests {
 						.param("page", "-1")
 						.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ALMACENERO"))))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("Parametro de solicitud invalido."));
+				.andExpect(jsonPath("$.message").value("Parámetro de solicitud inválido."));
 	}
 
 	@Test
@@ -83,7 +83,7 @@ class ManejadorGlobalExceptionIntegrationTests {
 						.param("size", "101")
 						.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ALMACENERO"))))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("Parametro de solicitud invalido."));
+				.andExpect(jsonPath("$.message").value("Parámetro de solicitud inválido."));
 	}
 
 	@Test
@@ -92,7 +92,7 @@ class ManejadorGlobalExceptionIntegrationTests {
 						.param("estado", "NO_EXISTE")
 						.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ALMACENERO"))))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("Parametro de solicitud invalido."));
+				.andExpect(jsonPath("$.message").value("Parámetro de solicitud inválido."));
 	}
 
 	@Test
@@ -101,7 +101,7 @@ class ManejadorGlobalExceptionIntegrationTests {
 						.param("stockEstado", "INVALIDO")
 						.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ALMACENERO"))))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("Parametro de solicitud invalido."));
+				.andExpect(jsonPath("$.message").value("Parámetro de solicitud inválido."));
 	}
 
 	@Test

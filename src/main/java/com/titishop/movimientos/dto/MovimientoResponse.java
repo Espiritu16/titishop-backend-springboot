@@ -16,7 +16,7 @@ public record MovimientoResponse(
 		String productoSku,
 		@Schema(description = "Proveedor relacionado.", example = "5a81e2d0-55f8-4a3b-8d65-febec9959002", nullable = true)
 		UUID proveedorId,
-		@Schema(description = "Razon social del proveedor.", example = "Distribuidora Lima Norte SAC", nullable = true)
+		@Schema(description = "Razón social del proveedor.", example = "Distribuidora Lima Norte SAC", nullable = true)
 		String proveedorRazonSocial,
 		@Schema(description = "Tipo de movimiento.", example = "ENTRADA")
 		TipoMovimiento tipo,
@@ -32,7 +32,7 @@ public record MovimientoResponse(
 		UUID creadoPorId,
 		@Schema(description = "Nombre del usuario que creo el movimiento.", example = "Kevin Espiritu Castillo")
 		String creadoPorNombre,
-		@Schema(description = "Fecha de creacion.", example = "2026-06-02T14:10:00Z")
+		@Schema(description = "Fecha de creación.", example = "2026-06-02T14:10:00Z")
 		Instant creadoEn,
 		@Schema(description = "Fecha de anulacion si aplica.", example = "2026-06-02T15:00:00Z", nullable = true)
 		Instant anuladoEn,

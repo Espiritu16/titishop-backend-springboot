@@ -6,11 +6,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record ConsultaRucProveedorResponse(
 		@Schema(description = "RUC consultado.", example = "20123456789")
 		String ruc,
-		@Schema(description = "Razon social registrada en SUNAT.", example = "Distribuidora Lima Norte SAC")
+		@Schema(description = "Razón social registrada en SUNAT.", example = "Distribuidora Lima Norte SAC")
 		String razonSocial,
-		@Schema(description = "Direccion resumida.", example = "Av. Los Almacenes 321")
+		@Schema(description = "Dirección resumida.", example = "Av. Los Almacenes 321")
 		String direccion,
-		@Schema(description = "Direccion completa.", example = "Av. Los Almacenes 321, Independencia, Lima")
+		@Schema(description = "Dirección completa.", example = "Av. Los Almacenes 321, Independencia, Lima")
 		String direccionCompleta,
 		@Schema(description = "Departamento.", example = "LIMA")
 		String departamento,
@@ -20,7 +20,7 @@ public record ConsultaRucProveedorResponse(
 		String distrito,
 		@Schema(description = "Estado tributario.", example = "ACTIVO")
 		String estadoContribuyente,
-		@Schema(description = "Condicion tributaria.", example = "HABIDO")
+		@Schema(description = "Condición tributaria.", example = "HABIDO")
 		String condicionContribuyente
 ) {
 }

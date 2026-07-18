@@ -3,7 +3,7 @@ package com.titishop.autenticacion.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 
-@Schema(name = "LoginResponse", description = "Datos de autenticacion generados luego de un login exitoso.")
+@Schema(name = "LoginResponse", description = "Datos de autenticación generados luego de un login exitoso.")
 public record LoginResponse(
 		@Schema(description = "JWT firmado para consumir endpoints protegidos.", example = "eyJhbGciOiJIUzI1NiJ9.token-ficticio.swagger")
 		String token,

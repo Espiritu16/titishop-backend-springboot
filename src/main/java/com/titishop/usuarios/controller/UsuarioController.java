@@ -54,7 +54,7 @@ public class UsuarioController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Listado obtenido correctamente.",
 					content = @Content(schema = @Schema(implementation = PaginaResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -74,7 +74,7 @@ public class UsuarioController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Usuario encontrado.",
 					content = @Content(schema = @Schema(implementation = UsuarioResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Usuario no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -109,9 +109,9 @@ public class UsuarioController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "201", description = "Usuario creado correctamente.",
 					content = @Content(schema = @Schema(implementation = UsuarioResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "409", description = "Ya existe un usuario con el correo enviado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -123,7 +123,7 @@ public class UsuarioController {
 	}
 
 	@PutMapping("/{id}")
-	@Operation(summary = "Actualizar usuario", description = "Actualiza perfil, rol, estado y opcionalmente la contrasena de un usuario.")
+	@Operation(summary = "Actualizar usuario", description = "Actualiza perfil, rol, estado y opcionalmente la contraseña de un usuario.")
 	@io.swagger.v3.oas.annotations.parameters.RequestBody(
 			required = true,
 			description = "Datos actualizados del usuario.",
@@ -146,9 +146,9 @@ public class UsuarioController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Usuario actualizado correctamente.",
 					content = @Content(schema = @Schema(implementation = UsuarioResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Usuario no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -170,9 +170,9 @@ public class UsuarioController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Estado actualizado correctamente.",
 					content = @Content(schema = @Schema(implementation = UsuarioResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Usuario no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -187,10 +187,10 @@ public class UsuarioController {
 
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@Operation(summary = "Inactivar usuario", description = "Marca un usuario como inactivo sin eliminarlo fisicamente.")
+	@Operation(summary = "Inactivar usuario", description = "Marca un usuario como inactivo sin eliminarlo físicamente.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "204", description = "Usuario inactivado correctamente."),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Usuario no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),

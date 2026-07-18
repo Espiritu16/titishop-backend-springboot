@@ -30,7 +30,7 @@ class ManejadorGlobalExceptionTests {
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 		assertThat(response.getBody())
 				.extracting(ErrorResponse::message)
-				.isEqualTo("Formato de exportacion invalido. Use excel o pdf.");
+				.isEqualTo("Formato de exportación inválido. Use Excel o PDF.");
 		assertThat(response.getBody().details()).containsExactly("formato: valores permitidos excel, pdf");
 	}
 

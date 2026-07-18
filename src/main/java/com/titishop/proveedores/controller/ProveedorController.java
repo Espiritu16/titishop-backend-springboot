@@ -55,7 +55,7 @@ public class ProveedorController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Listado obtenido correctamente.",
 					content = @Content(schema = @Schema(implementation = PaginaResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -74,7 +74,7 @@ public class ProveedorController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Proveedor encontrado.",
 					content = @Content(schema = @Schema(implementation = ProveedorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Proveedor no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -86,13 +86,13 @@ public class ProveedorController {
 	}
 
 	@GetMapping("/consulta-ruc/{ruc}")
-	@Operation(summary = "Consultar RUC", description = "Consulta datos tributarios de un proveedor a partir de su numero de RUC.")
+	@Operation(summary = "Consultar RUC", description = "Consulta datos tributarios de un proveedor a partir de su número de RUC.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Consulta realizada correctamente.",
 					content = @Content(schema = @Schema(implementation = ConsultaRucProveedorResponse.class))),
-			@ApiResponse(responseCode = "400", description = "RUC con formato invalido.",
+			@ApiResponse(responseCode = "400", description = "RUC con formato inválido.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "RUC no encontrado en el servicio externo.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -100,8 +100,8 @@ public class ProveedorController {
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 	})
 	public ConsultaRucProveedorResponse consultarRuc(
-			@Parameter(description = "RUC de 11 digitos a consultar.", example = "20123456789")
-			@PathVariable @Pattern(regexp = "\\d{11}", message = "ruc debe tener 11 digitos") String ruc
+			@Parameter(description = "RUC de 11 dígitos a consultar.", example = "20123456789")
+			@PathVariable @Pattern(regexp = "\\d{11}", message = "RUC debe tener 11 dígitos") String ruc
 	) {
 		return proveedorService.consultarRuc(ruc);
 	}
@@ -132,9 +132,9 @@ public class ProveedorController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "201", description = "Proveedor creado correctamente.",
 					content = @Content(schema = @Schema(implementation = ProveedorResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "409", description = "RUC o correo ya registrados.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -171,9 +171,9 @@ public class ProveedorController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Proveedor actualizado correctamente.",
 					content = @Content(schema = @Schema(implementation = ProveedorResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Proveedor no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -195,9 +195,9 @@ public class ProveedorController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Estado actualizado correctamente.",
 					content = @Content(schema = @Schema(implementation = ProveedorResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Proveedor no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -215,7 +215,7 @@ public class ProveedorController {
 	@Operation(summary = "Inactivar proveedor", description = "Marca un proveedor como inactivo sin eliminarlo.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "204", description = "Proveedor inactivado correctamente."),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Proveedor no encontrado.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),

@@ -15,7 +15,7 @@ public record ActualizarUsuarioRequest(
 		@NotBlank @Size(max = 120) String nombreCompleto,
 		@Schema(description = "Correo actualizado del usuario.", example = "kevin.espiritu@titishop.com", maxLength = 160)
 		@NotBlank @Email @Size(max = 160) String email,
-		@Schema(description = "Nueva contrasena. Si se envía, no puede contener solo espacios.", example = "NuevaClave123*", minLength = 8, maxLength = 120, nullable = true)
+		@Schema(description = "Nueva contraseña. Si se envía, no puede contener solo espacios.", example = "NuevaClave123*", minLength = 8, maxLength = 120, nullable = true)
 		@Pattern(regexp = ".*\\S.*", message = "password no debe contener solo espacios")
 		@Size(min = 8, max = 120) String password,
 		@Schema(description = "Rol vigente del usuario.", example = "ADMINISTRADOR")

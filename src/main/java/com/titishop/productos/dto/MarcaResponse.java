@@ -12,9 +12,9 @@ public record MarcaResponse(
 		String nombre,
 		@Schema(description = "Estado de la marca.", example = "ACTIVO")
 		EstadoCatalogo estado,
-		@Schema(description = "Fecha de creacion.", example = "2026-06-01T10:00:00Z")
+		@Schema(description = "Fecha de creación.", example = "2026-06-01T10:00:00Z")
 		Instant creadoEn,
-		@Schema(description = "Fecha de actualizacion.", example = "2026-06-02T10:30:00Z")
+		@Schema(description = "Fecha de actualización.", example = "2026-06-02T10:30:00Z")
 		Instant actualizadoEn
 ) {
 }

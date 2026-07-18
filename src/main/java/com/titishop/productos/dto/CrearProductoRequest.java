@@ -8,23 +8,23 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Schema(name = "CrearProductoRequest", description = "Payload para registrar un producto del catalogo.")
+@Schema(name = "CrearProductoRequest", description = "Payload para registrar un producto del catálogo.")
 public record CrearProductoRequest(
 		@Schema(description = "Nombre comercial del producto.", example = "Leche Evaporada Entera 400g", maxLength = 120)
 		@NotBlank @Size(max = 120) String nombre,
 		@Schema(description = "SKU unico para control interno.", example = "LEC-400-001", maxLength = 40)
 		@NotBlank @Size(max = 40) String sku,
-		@Schema(description = "Descripcion visible del producto.", example = "Leche evaporada entera en lata de 400 gramos.", maxLength = 2000)
+		@Schema(description = "Descripción visible del producto.", example = "Leche evaporada entera en lata de 400 gramos.", maxLength = 2000)
 		@NotBlank @Size(max = 2000) String descripcion,
-		@Schema(description = "URL publica de la imagen del producto.", example = "https://cdn.titishop.local/productos/leche-400g.png", maxLength = 500, nullable = true)
+		@Schema(description = "URL pública de la imagen del producto.", example = "https://cdn.titishop.local/productos/leche-400g.png", maxLength = 500, nullable = true)
 		@Size(max = 500) String imagenUrl,
-		@Schema(description = "Identificador de la categoria.", example = "0f1e2d3c-4b5a-6789-9012-3456789abcde")
+		@Schema(description = "Identificador de la categoría.", example = "0f1e2d3c-4b5a-6789-9012-3456789abcde")
 		@NotNull UUID categoriaId,
 		@Schema(description = "Identificador de la marca.", example = "1ab2cd34-56ef-7890-ab12-cd34ef567890")
 		@NotNull UUID marcaId,
 		@Schema(description = "Identificador del proveedor principal del producto.", example = "5a81e2d0-55f8-4a3b-8d65-febec9959002")
 		@NotNull UUID proveedorId,
-		@Schema(description = "Pais de origen del producto importado.", example = "China", maxLength = 80)
+		@Schema(description = "País de origen del producto importado.", example = "China", maxLength = 80)
 		@NotBlank @Size(max = 80) String paisOrigen,
 		@Schema(description = "Precio de compra del producto.", example = "3.20", minimum = "0")
 		@NotNull @DecimalMin(value = "0.0", inclusive = true) BigDecimal precioCompra,

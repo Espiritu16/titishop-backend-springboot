@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
 public record RestablecerPasswordRequest(
 		@NotBlank @Email String email,
 		@NotBlank String resetToken,
-		@Schema(description = "Nueva contrasena del usuario.", minLength = 8, maxLength = 120)
+		@Schema(description = "Nueva contraseña del usuario.", minLength = 8, maxLength = 120)
 		@NotBlank @Size(min = 8, max = 120) String nuevaPassword
 ) {
 }

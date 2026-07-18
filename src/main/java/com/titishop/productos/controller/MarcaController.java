@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Validated
 @RequestMapping("/api/marcas")
-@Tag(name = "Marcas", description = "Gestion de marcas comerciales del catalogo.")
+@Tag(name = "Marcas", description = "Gestión de marcas comerciales del catálogo.")
 @SecurityRequirement(name = "bearerAuth")
 public class MarcaController {
 
@@ -53,7 +53,7 @@ public class MarcaController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Listado obtenido correctamente.",
 					content = @Content(schema = @Schema(implementation = PaginaResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -72,7 +72,7 @@ public class MarcaController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Marca encontrada.",
 					content = @Content(schema = @Schema(implementation = MarcaResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Marca no encontrada.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -104,9 +104,9 @@ public class MarcaController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "201", description = "Marca creada correctamente.",
 					content = @Content(schema = @Schema(implementation = MarcaResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "409", description = "Ya existe una marca con ese nombre.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -138,9 +138,9 @@ public class MarcaController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Marca actualizada correctamente.",
 					content = @Content(schema = @Schema(implementation = MarcaResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Marca no encontrada.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -162,9 +162,9 @@ public class MarcaController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Estado actualizado correctamente.",
 					content = @Content(schema = @Schema(implementation = MarcaResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Datos de entrada invalidos.",
+			@ApiResponse(responseCode = "400", description = "Datos de entrada inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Marca no encontrada.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -182,7 +182,7 @@ public class MarcaController {
 	@Operation(summary = "Inactivar marca", description = "Marca un registro como inactivo sin eliminarlo.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "204", description = "Marca inactivada correctamente."),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "404", description = "Marca no encontrada.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),

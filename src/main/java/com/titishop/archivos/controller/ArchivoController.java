@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/archivos")
-@Tag(name = "Archivos", description = "Carga de imagenes locales para recursos del sistema.")
+@Tag(name = "Archivos", description = "Carga de imágenes locales para recursos del sistema.")
 @SecurityRequirement(name = "bearerAuth")
 public class ArchivoController {
 
@@ -32,7 +32,7 @@ public class ArchivoController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Operation(
 			summary = "Subir imagen de producto",
-			description = "Guarda una imagen en el almacenamiento local del VPS y devuelve la URL publica.",
+			description = "Guarda una imagen en el almacenamiento local del VPS y devuelve la URL pública.",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
 					required = true,
 					content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)

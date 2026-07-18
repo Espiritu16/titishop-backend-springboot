@@ -44,9 +44,9 @@ public class ReporteController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Reporte generado correctamente.",
 					content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReporteMovimientosResponse.class)))),
-			@ApiResponse(responseCode = "400", description = "Parametros de filtro invalidos.",
+			@ApiResponse(responseCode = "400", description = "Parámetros de filtro inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -76,13 +76,13 @@ public class ReporteController {
 	}
 
 	@GetMapping("/stock")
-	@Operation(summary = "Reporte de stock", description = "Genera un reporte del stock actual filtrable por estado, categoria, marca o texto.")
+	@Operation(summary = "Reporte de stock", description = "Genera un reporte del stock actual filtrable por estado, categoría, marca o texto.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Reporte generado correctamente.",
 					content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReporteStockResponse.class)))),
-			@ApiResponse(responseCode = "400", description = "Parametros de filtro invalidos.",
+			@ApiResponse(responseCode = "400", description = "Parámetros de filtro inválidos.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -90,7 +90,7 @@ public class ReporteController {
 	public List<ReporteStockResponse> reporteStock(
 			@Parameter(description = "Filtra por estado de inventario.", example = "ACTIVO")
 			@RequestParam(required = false) EstadoInventario estado,
-			@Parameter(description = "Filtra por ID de categoria.", example = "0f1e2d3c-4b5a-6789-9012-3456789abcde")
+			@Parameter(description = "Filtra por ID de categoría.", example = "0f1e2d3c-4b5a-6789-9012-3456789abcde")
 			@RequestParam(required = false) UUID categoriaId,
 			@Parameter(description = "Filtra por ID de marca.", example = "1ab2cd34-56ef-7890-ab12-cd34ef567890")
 			@RequestParam(required = false) UUID marcaId,
@@ -105,7 +105,7 @@ public class ReporteController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Reporte generado correctamente.",
 					content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReporteStockCriticoResponse.class)))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -119,7 +119,7 @@ public class ReporteController {
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Reporte generado correctamente.",
 					content = @Content(schema = @Schema(implementation = ReporteValorizacionResponse.class))),
-			@ApiResponse(responseCode = "401", description = "Token JWT ausente o invalido."),
+			@ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido."),
 			@ApiResponse(responseCode = "403", description = "Acceso denegado para el rol autenticado."),
 			@ApiResponse(responseCode = "500", description = "Error interno del servidor.",
 					content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
